@@ -1,0 +1,50 @@
+name: 🔄 自动同步上游仓库
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+env:
+  UPSTREAM_URL: https://github.com/anonfaded/FadCam.git
+  UPSTREAM_BRANCH: master   # 主仓库的分支（根据你核实的情况，如果是master就填master）
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 检出 Fork 仓库（自动使用默认分支）
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: ⚙️ 配置 Git 用户
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🔗 添加上游远程
+        run: git remote add upstream ${{ env.UPSTREAM_URL }}
+
+      - name: 📡 拉取上游更新
+        run: git fetch upstream ${{ env.UPSTREAM_BRANCH }}
+
+      - name: 🔀 合并上游更改
+        id: merge
+        continue-on-error: true
+        run: |
+          git merge upstream/${{ env.UPSTREAM_BRANCH }} --no-edit
+
+      - name: ⚠️ 合并失败处理
+        if: steps.merge.outcome == 'failure'
+        run: |
+          echo "合并冲突，请手动解决。"
+          git merge --abort
+          exit 1
+
+      - name: 🚀 推送到远程
+        run: git push origin HEAD
