@@ -677,8 +677,10 @@ public class CloudAuthManager {
             encodedReturnUrl = deviceLinkUrl.replace("?", "%3F").replace("&", "%26").replace("=", "%3D");
         }
         
-        // Return the login URL with the device-link return path
-        return AUTH_BASE_URL + "/login?return=" + encodedReturnUrl;
+        // Return the login URL with the device-link return path.
+        // Append cache-busting timestamp so the WebView always fetches the latest
+        // frontend (never serves a stale version from disk cache).
+        return AUTH_BASE_URL + "/login?return=" + encodedReturnUrl + "&_t=" + System.currentTimeMillis();
     }
     
     /**
@@ -714,7 +716,7 @@ public class CloudAuthManager {
         }
         
         String deviceId = getDeviceId();
-        String url = "https://vfhehknmxxedvesdvpew.supabase.co/functions/v1/get-device-info?device_id=" + deviceId;
+        String url = SUPABASE_URL + "/functions/v1/get-device-info?device_id=" + deviceId;
         
         // Use a background thread for network call
         new Thread(() -> {
@@ -724,6 +726,12 @@ public class CloudAuthManager {
                 conn.setRequestMethod("GET");
                 conn.setConnectTimeout(10000);
                 conn.setReadTimeout(10000);
+                
+                // Send JWT for authorization (required by updated edge function)
+                String jwt = getJwtToken();
+                if (jwt != null && !jwt.isEmpty()) {
+                    conn.setRequestProperty("Authorization", "Bearer " + jwt);
+                }
                 
                 int responseCode = conn.getResponseCode();
                 
