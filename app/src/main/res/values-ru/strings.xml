@@ -403,7 +403,8 @@
     <string name="row_orientation_title">Ориентация</string>
     <string name="row_record_audio_title">Записывать аудио</string>
     <string name="row_input_source_title">Источник входа</string>
-    <string name="row_noise_suppression_title">Подавление шума</string>
+    <string name="row_raw_audio_title">Сырой звук</string>
+    <string name="raw_audio_banner">Полностью сырой звук недоступен на этом устройстве</string>
     <string name="settings_location_watermark_title">Водяной знак местоположения</string>
     <string name="delete_all_videos_title">Удалить все видео</string>
     <string name="delete_all_videos_description">Вы уверены, что хотите удалить все видео?</string>
@@ -682,7 +683,7 @@
     <!-- Helper subtitles for new Audio rows -->
     <string name="helper_record_audio">Переключить захват микрофонного аудио в видео.</string>
     <string name="helper_audio_input_source">Выберите, какой подключённый микрофон/вход использовать.</string>
-    <string name="helper_noise_suppression">Экспериментальный фильтр для уменьшения фонового шума.</string>
+    <string name="helper_raw_audio">Записывает сырой звук микрофона без автоматического подавления шума и балансировки громкости телефона. Отлично подходит, если вы планируете редактировать звук самостоятельно. Применяется к новым записям.</string>
     <string name="helper_audio_advanced">Настроить битрейт и частоту дискретизации для баланса качества/размера.</string>
     <string name="helper_audio_bitrate_detail">Рекомендуется: 192000 бит/с для высококачественного стерео. Более низкие значения уменьшают размер файла, но могут снизить ясность. Диапазон 64000–384000 бит/с.</string>
     <string name="helper_audio_sampling_detail">Выберите 48000 Гц для видео (рекомендуется) или 44100 Гц для общей совместимости аудио.</string>
@@ -697,6 +698,9 @@
     <string name="helper_location_watermark">Добавляет наложение текста с местоположением в реальном времени во время записи.</string>
     <string name="helper_location_embed">Встраивает GPS-координаты в метаданные видео (геотег).</string>
     <string name="video_setting_location_embed_title">Встроить метаданные местоположения</string>
+    <string name="setting_video_stabilization_title">Стабилизация видео</string>
+    <string name="setting_not_supported">Не поддерживается на этом устройстве</string>
+    <string name="video_stabilization_footer">Делает видео стабильным, компенсируя дрожание рук электронной (EIS) и оптической (OIS) стабилизацией. Для этого кадр слегка обрезается.</string>
     <string name="video_setting_location_embed_enabled">Включено</string>
     <string name="video_setting_location_embed_disabled">Отключено</string>
     <string name="helper_watermark_option">Выберите содержимое наложения: временная метка + бренд, только временная метка или ничего.</string>
@@ -1141,7 +1145,7 @@
     <string name="camera_error_service">Ошибка службы камеры</string>
     <string name="camera_error_unknown">Неизвестная ошибка камеры</string>
     <string name="camera_resources_cooldown">Пожалуйста, подождите немного перед началом новой записи</string>
-    <string name="dialog_audio_noise_suppression_label">Подавление шума</string>
+    <string name="raw_audio_unprocessed_note">Полностью сырой звук недоступен на этом устройстве. Вместо этого используется режим микрофона для распознавания речи (VOICE_RECOGNITION), отключающий большую часть обработки — разница с обычной записью может быть едва заметной.</string>
     <!-- duplicate removed: row_record_audio_title already defined above -->
 
     <string name="fix_video_menu_title">Исправить видео (Восстановить воспроизведение)</string>
@@ -2058,6 +2062,14 @@ FadCam использует фрагментированный формат MP4 
     <string name="preview_quick_actions_title">Быстрые действия предпросмотра</string>
 
     <string name="preview_quick_actions_sub">Показывать иконки FadShot и полноэкранного режима даже в режиме ожидания записи.</string>
+    <string name="grid_lines_title">Линии сетки</string>
+    <string name="home_icon_picker_title">Иконка главного экрана</string>
+    <string name="home_icon_home">Главная</string>
+    <string name="home_icon_jet">Истребитель</string>
+    <string name="home_icon_pilot">Пилот</string>
+    <string name="quick_mute_label">Без звука</string>
+    <string name="quick_unmute_label">Звук</string>
+    <string name="grid_lines_subtitle">Правило третей на предпросмотре</string>
 
     <string name="preview_quick_actions_state_always">Всегда видимы (ожидание + запись)</string>
 
@@ -2769,6 +2781,10 @@ FadCam использует фрагментированный формат MP4 
     <string name="motion_lab_row_subtitle">Умная запись событий для использования как CCTV</string>
     <string name="automation_title">Автоматизация</string>
     <string name="automation_row_subtitle">Назначение кнопок, Bluetooth-пульты, клавиши громкости</string>
+    <string name="setting_volume_shutter_title">Затвор клавишами громкости</string>
+    <string name="setting_volume_shutter_summary">Клавиши громкости работают как затвор камеры на главной вкладке</string>
+    <string name="setting_volume_shutter_footer">Клавиши громкости становятся затвором на главной вкладке:\n• Касание — фото\n• Двойное касание — смена камеры\n• Долгое нажатие — начать или остановить запись\n\nBluetooth-пульты-затворы тоже работают и запускают те же действия. Клавиши работают, пока открыта главная вкладка FadCam — будущие версии позволят любой кнопке запускать действия FadCam, даже в фоне.\n\nПока используйте MacroDroid для назначения ярлыков FadCam — они в разделе «Настройки → Ярлыки и виджеты».</string>
+    <string name="shortcuts_macrodroid_template">Официальный шаблон MacroDroid: https://templates.macrodroid.com/view/28194</string>
     <string name="thermal_guardian_title">Тепловой Защитник</string>
     <string name="thermal_guardian_row_subtitle">Автоматическая настройка записи для предотвращения перегрева</string>
     <string name="audio_vision_title">Аудио Видение</string>

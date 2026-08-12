@@ -653,7 +653,7 @@ Empfohlen: 192000 bps, 48000 Hz für die meisten Benutzer.</string>
     <string name="camera_error_service">Kameradienstfehler</string>
     <string name="camera_error_unknown">Unbekannter Kamerafehler</string>
     <string name="camera_resources_cooldown">Bitte warte einen Moment, bevor du eine neue Aufnahme startest</string>
-    <string name="dialog_audio_noise_suppression_label">Rauschunterdrückung</string>
+    <string name="raw_audio_unprocessed_note">Vollständig unverarbeitetes Audio ist auf diesem Gerät nicht verfügbar. Es wird stattdessen der Mikrofonmodus zur Spracherkennung (VOICE_RECOGNITION) verwendet, der die meiste Verarbeitung deaktiviert — der Unterschied zur normalen Aufnahme kann dezent sein.</string>
     <string name="fix_video_menu_title">Video reparieren (Wiedergabe wiederherstellen)</string>
     <string name="fix_video_repairing">Repariere... Dies kann einige Sekunden dauern.</string>
     <string name="fix_video_success">Video repariert! Gespeichert als: %1$s</string>
@@ -1168,7 +1168,8 @@ Empfohlen: 192000 bps, 48000 Hz für die meisten Benutzer.</string>
     <string name="row_orientation_title">Ausrichtung</string>
     <string name="row_record_audio_title">Audio aufnehmen</string>
     <string name="row_input_source_title">Eingabequelle</string>
-    <string name="row_noise_suppression_title">Rauschunterdrückung</string>
+    <string name="row_raw_audio_title">Rohes Audio</string>
+    <string name="raw_audio_banner">Vollständig unverarbeitetes Audio ist auf diesem Gerät nicht verfügbar</string>
     <string name="settings_location_watermark_title">Standort-Wasserzeichen</string>
     <string name="delete_single_video_subtitle">Diese Aufnahme entfernen</string>
     <string name="note_debug_detailed">Wenn aktiviert, schreibt FadCam eine Debug-Protokoll-HTML-Datei (FADCAM_debug.html) im öffentlichen Ordner Downloads/FadCam/. Teile diese Datei beim Melden von Problemen. Deaktivieren, um zukünftige Schreibvorgänge zu stoppen.\nHinweis: Debug-Protokollierung kann während der Aufnahme Performance-Overhead hinzufügen – deaktiviert lassen, außer zur Fehlersuche.</string>
@@ -1735,7 +1736,7 @@ Empfohlen: 192000 bps, 48000 Hz für die meisten Benutzer.</string>
     <string name="helper_audio_sampling_recommended">Empfohlen: 48000 Hz</string>
     <string name="helper_location_embed">Bettet GPS-Koordinaten in Video-Metadaten ein (Geotag).</string>
     <string name="helper_location_watermark">Fügt während der Aufnahme einen Live-Standorttext-Overlay hinzu.</string>
-    <string name="helper_noise_suppression">Experimenteller Filter zur Reduzierung von Hintergrundgeräuschen.</string>
+    <string name="helper_raw_audio">Zeichnet den Rohklang des Mikrofons ohne automatische Rauschunterdrückung und Lautstärkeanpassung des Telefons auf. Ideal, wenn du den Ton später selbst bearbeiten möchtest. Gilt für neue Aufnahmen.</string>
     <string name="helper_record_audio">Schaltet die Mikrofon-Audioaufnahme in Videos um.</string>
     <string name="helper_watermark_option">Wähle Overlay-Inhalt: Zeitstempel + Marke, nur Zeitstempel oder keines.</string>
     <string name="home_sidebar_discord">Discord</string>
@@ -1862,6 +1863,10 @@ Empfohlen: 192000 bps, 48000 Hz für die meisten Benutzer.</string>
     <string name="motion_lab_title">Bewegungslabor</string>
     <string name="automation_title">Automatisierung</string>
     <string name="automation_row_subtitle">Tastenbelegung, Bluetooth-Fernbedienungen, Lautstärketasten</string>
+    <string name="setting_volume_shutter_title">Lautstärketasten-Auslöser</string>
+    <string name="setting_volume_shutter_summary">Die Lautstärketasten dienen als Kameraauslöser auf dem Start-Tab</string>
+    <string name="setting_volume_shutter_footer">Die Lautstärketasten werden auf dem Start-Tab zu Ihrem Auslöser:\n• Tippen — Foto aufnehmen\n• Doppeltippen — Kamera wechseln\n• Gedrückt halten — Aufnahme starten oder stoppen\n\nBluetooth-Fernauslöser funktionieren ebenfalls und lösen dieselben Aktionen aus. Die Tasten funktionieren, solange der FadCam-Start-Tab geöffnet ist — zukünftige Versionen lassen jede Taste FadCam-Aktionen auslösen, auch im Hintergrund.\n\nNutzen Sie vorerst MacroDroid, um FadCam-Verknüpfungen zuzuordnen — Sie finden sie unter Einstellungen → Verknüpfungen &amp; Widgets.</string>
+    <string name="shortcuts_macrodroid_template">Offizielle MacroDroid-Vorlage: https://templates.macrodroid.com/view/28194</string>
     <string name="thermal_guardian_title">Wärmeschutz</string>
     <string name="thermal_guardian_row_subtitle">Aufnahme automatisch anpassen, um Überhitzung zu vermeiden</string>
     <string name="audio_vision_title">Audio Vision</string>
@@ -1913,6 +1918,14 @@ Für die flüssigste Wiedergabe kannst du einen externen Player wie VLC verwende
     <string name="preview_quick_actions_state_always">Immer sichtbar (Bereitschaft + Aufnahme)</string>
     <string name="preview_quick_actions_state_recording_only">Nur während der Aufnahme sichtbar</string>
     <string name="preview_quick_actions_sub">FadShot- und Vollbildsymbole auch im Leerlauf anzeigen.</string>
+    <string name="grid_lines_title">Rasterlinien</string>
+    <string name="home_icon_picker_title">Home-Symbol</string>
+    <string name="home_icon_home">Home</string>
+    <string name="home_icon_jet">Kampfjet</string>
+    <string name="home_icon_pilot">Pilot</string>
+    <string name="quick_mute_label">Stummsch.</string>
+    <string name="quick_unmute_label">Ton an</string>
+    <string name="grid_lines_subtitle">Drittel-Regel-Overlay auf der Vorschau</string>
     <string name="preview_quick_actions_title">Vorschau-Schnellaktionen</string>
     <string name="preview_starting">Live-Vorschau wird gestartet…</string>
     <string name="previous">Zurück</string>
@@ -2220,6 +2233,9 @@ Für die flüssigste Wiedergabe kannst du einen externen Player wie VLC verwende
     <string name="video_setting_location_embed_disabled">Deaktiviert</string>
     <string name="video_setting_location_embed_enabled">Aktiviert</string>
     <string name="video_setting_location_embed_title">Standort-Metadaten einbetten</string>
+    <string name="setting_video_stabilization_title">Video-Stabilisierung</string>
+    <string name="setting_not_supported">Auf diesem Gerät nicht unterstützt</string>
+    <string name="video_stabilization_footer">Sorgt für ruhige Videos, indem Handbewegungen per elektronischer (EIS) und optischer (OIS) Stabilisierung ausgeglichen werden. Ein kleiner Bildausschnitt wird dafür benötigt.</string>
     <string name="view_mode_grid">Raster</string>
     <string name="view_mode_list">Liste</string>
     <string name="watch_audio_label">Audio</string>

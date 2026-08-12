@@ -56,6 +56,7 @@ public abstract class Constants {
     public static final String PREF_SELECTED_TORCH_SOURCE =
         "pref_selected_torch_source";
     public static final String PREF_TORCH_STATE = "pref_torch_state";
+    public static final String PREF_VOLUME_SHUTTER_ENABLED = "pref_volume_shutter_enabled"; // Volume keys as camera shutter (long press = record, click = FadShot)
     public static final String PREF_LOCATION_DATA = "location_data";
     public static final String PREF_EMBED_LOCATION_DATA = "embed_location_data";
     public static final String PREF_DEBUG_DATA = "debug_data";
@@ -232,6 +233,10 @@ public abstract class Constants {
         "com.fadcam.ACTION_SET_ZOOM_RATIO";
     public static final String INTENT_ACTION_SET_FRONT_VIDEO_MIRROR =
         "com.fadcam.ACTION_SET_FRONT_VIDEO_MIRROR";
+    public static final String INTENT_ACTION_SET_VIDEO_STABILIZATION =
+        "com.fadcam.ACTION_SET_VIDEO_STABILIZATION";
+    public static final String INTENT_ACTION_SET_AUDIO_MUTED =
+        "com.fadcam.ACTION_SET_AUDIO_MUTED";
     public static final String INTENT_ACTION_START_PREVIEW_ONLY =
         "com.fadcam.ACTION_START_PREVIEW_ONLY";
     public static final String INTENT_ACTION_STOP_PREVIEW_ONLY =
@@ -395,6 +400,26 @@ public abstract class Constants {
     public static final String EXTRA_ZOOM_RATIO = "com.fadcam.EXTRA_ZOOM_RATIO"; // float
     /** Pan offset X for zoom: float -1.0 (full left) to +1.0 (full right), 0.0 = centre */
     public static final String EXTRA_PAN_X = "com.fadcam.EXTRA_PAN_X"; // float
+    public static final String EXTRA_VIDEO_STABILIZATION_ENABLED =
+        "com.fadcam.EXTRA_VIDEO_STABILIZATION_ENABLED"; // boolean
+    public static final String EXTRA_AUDIO_MUTED =
+        "com.fadcam.EXTRA_AUDIO_MUTED"; // boolean
+    // Video stabilization (EIS/OIS) — default ON
+    public static final String PREF_VIDEO_STABILIZATION_ENABLED =
+        "pref_video_stabilization_enabled";
+    // Raw (unprocessed) audio capture — OFF by default (platform-processed CAMCORDER)
+    public static final String PREF_RAW_AUDIO_ENABLED = "pref_raw_audio_enabled";
+    // Realtime audio mute state for the home quick action (persisted per user's choice)
+    public static final String PREF_AUDIO_MUTED = "pref_audio_muted";
+    // Home nav icon choice: "default" | "jet" | "pilot" (default = normal house)
+    public static final String PREF_HOME_ICON = "pref_home_icon";
+    public static final String HOME_ICON_DEFAULT = "default";
+    public static final String HOME_ICON_JET = "jet";
+    public static final String HOME_ICON_PILOT = "pilot";
+    // Quick-action button slots (comma-separated "token:slot" pairs). Key bumped to
+    // v2 so polluted positions saved by earlier broken drag builds are discarded.
+    public static final String PREF_QUICK_ACTIONS_ORDER = "pref_quick_actions_slots_v2";
+    public static final String DEFAULT_QUICK_ACTIONS_ORDER = "mute,full,fadshot";
     /** Pan offset Y for zoom: float -1.0 (full top) to +1.0 (full bottom), 0.0 = centre */
     public static final String EXTRA_PAN_Y = "com.fadcam.EXTRA_PAN_Y"; // float
     public static final String INTENT_ACTION_PAUSE_RECORDING =
@@ -634,6 +659,8 @@ public abstract class Constants {
     // Show preview quick actions (FadShot + Fullscreen) even when recording is not active.
     public static final String PREF_PREVIEW_QUICK_ACTIONS_ALWAYS_VISIBLE =
         "pref_preview_quick_actions_always_visible";
+    // Rule-of-thirds grid overlay on the camera preview (default off).
+    public static final String PREF_GRID_LINES_ENABLED = "pref_grid_lines_enabled";
     // Player controller auto-hide timeout in seconds. Controls disappear after this many seconds of inactivity.
     // 0 = never auto-hide (controls stay visible until user toggles).
     public static final String PREF_PLAYER_CONTROLS_TIMEOUT_SECONDS =

@@ -175,6 +175,9 @@ public class GLRecordingPipeline {
     private boolean audioEncoderStarted = false;
     private boolean audioRecordingEnabled = false;
     private boolean audioThreadRunning = false;
+    /** Realtime mute: when true, captured mic frames are zeroed so the AAC track
+     *  stays continuous (no desync) but silent. Toggled live from the home UI. */
+    private volatile boolean audioMuted = false;
     private final Object audioLock = new Object();
     private android.media.AudioManager audioManager;
     private android.media.AudioManager.OnAudioFocusChangeListener audioFocusListener;
@@ -2662,6 +2665,16 @@ public class GLRecordingPipeline {
         }
     }
 
+    /** Realtime audio mute for the LIVE recording (thread-safe, volatile flag). */
+    public void setAudioMuted(boolean muted) {
+        this.audioMuted = muted;
+        FLog.i(TAG, "Realtime audio mute = " + muted);
+    }
+
+    public boolean isAudioMuted() {
+        return audioMuted;
+    }
+
     public void setFrontVideoMirrorEnabled(boolean enabled) {
         frontVideoMirrorEnabled = enabled;
         if (glRenderer != null) {
@@ -2910,9 +2923,36 @@ public class GLRecordingPipeline {
         if (this.preferredAudioDevice != null) {
             this.audioSource = android.media.MediaRecorder.AudioSource.MIC;
             FLog.i(TAG, "Audio source: MIC (external device route)");
+        } else if (com.fadcam.SharedPreferencesManager.getInstance(context).isRawAudioEnabled()) {
+            // Raw audio: bypass platform processing (noise suppression + AGC).
+            //
+            // UNPROCESSED is the true raw source; VOICE_RECOGNITION is the officially
+            // documented fallback (developer.android.com: "If unavailable, consider
+            // VOICE_RECOGNITION"). Per AOSP, VOICE_RECOGNITION disables noise suppression
+            // and AGC but MAY still apply echo cancellation (AEC) if the device has it —
+            // so it's "no NS, no AGC, possibly AEC", not perfectly raw. That's inherent
+            // to the platform, not a bug. On devices advertising UNPROCESSED we never
+            // reach this branch.
+            boolean unprocessedSupported = false;
+            try {
+                android.media.AudioManager am = (android.media.AudioManager)
+                        context.getSystemService(Context.AUDIO_SERVICE);
+                if (am != null) {
+                    String prop = am.getProperty(
+                            android.media.AudioManager.PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED);
+                    unprocessedSupported = "true".equalsIgnoreCase(prop);
+                }
+            } catch (Exception e) {
+                FLog.w(TAG, "UNPROCESSED support check failed: " + e.getMessage());
+            }
+            this.audioSource = unprocessedSupported
+                    ? android.media.MediaRecorder.AudioSource.UNPROCESSED
+                    : android.media.MediaRecorder.AudioSource.VOICE_RECOGNITION;
+            FLog.i(TAG, "Audio source (RAW): " + this.audioSource
+                    + " (unprocessedSupported=" + unprocessedSupported + ")");
         } else {
             this.audioSource = android.media.MediaRecorder.AudioSource.CAMCORDER;
-            FLog.i(TAG, "Audio source: CAMCORDER (default device mic)");
+            FLog.i(TAG, "Audio source: CAMCORDER (default device mic, platform-processed)");
         }
     }
 
@@ -3010,19 +3050,6 @@ public class GLRecordingPipeline {
 
             if (audioRecord.getState() != android.media.AudioRecord.STATE_INITIALIZED) {
                 throw new RuntimeException("AudioRecord initialization failed");
-            }
-            boolean noiseSuppression = com.fadcam.SharedPreferencesManager.getInstance(context)
-                    .isNoiseSuppressionEnabled();
-            if (noiseSuppression && android.media.audiofx.NoiseSuppressor.isAvailable()) {
-                android.media.audiofx.NoiseSuppressor ns = android.media.audiofx.NoiseSuppressor
-                        .create(audioRecord.getAudioSessionId());
-                if (ns != null) {
-                    FLog.i(TAG, "NoiseSuppressor enabled for AudioRecord");
-                } else {
-                    FLog.w(TAG, "Failed to enable NoiseSuppressor (create returned null)");
-                }
-            } else if (noiseSuppression) {
-                FLog.w(TAG, "NoiseSuppressor requested but not available on this device");
             }
 
             // CRITICAL: Set AudioManager mode for recording
@@ -3127,6 +3154,10 @@ public class GLRecordingPipeline {
                     
                     int read = audioRecord.read(readBuffer, 0, readBuffer.length);
                     if (read > 0) {
+                        if (audioMuted) {
+                            // Realtime mute: encode silence (track stays continuous).
+                            java.util.Arrays.fill(readBuffer, 0, read, (byte) 0);
+                        }
                         int offset = 0;
                         while (offset < read && audioThreadRunning && !isPaused) {
                             int inputBufferIndex = audioEncoder.dequeueInputBuffer(10000);

@@ -795,6 +795,35 @@ public class RecordingService extends Service {
             float clampedPanX = Math.max(-1.0f, Math.min(1.0f, panX));
             float clampedPanY = Math.max(-1.0f, Math.min(1.0f, panY));
 
+            // The crop region lives in SENSOR coordinates while the user drags on the
+            // upright preview. The pan (display space) must be rotated by the sensor's
+            // display orientation before offsetting the crop centre, otherwise panning
+            // is transposed/flipped (e.g. dragging right moves the view vertically).
+            float sensorPanX = clampedPanX;
+            float sensorPanY = clampedPanY;
+            try {
+                switch (getDisplayToSensorRotation()) {
+                    case 90:
+                        // Display right/down ↔ sensor +Y/−X : cropShift = −R⁻¹(drag)
+                        sensorPanX = clampedPanY;
+                        sensorPanY = -clampedPanX;
+                        break;
+                    case 180:
+                        sensorPanX = -clampedPanX;
+                        sensorPanY = -clampedPanY;
+                        break;
+                    case 270:
+                        sensorPanX = -clampedPanY;
+                        sensorPanY = clampedPanX;
+                        break;
+                    default:
+                        break; // 0°
+                }
+            } catch (Exception e) {
+                sensorPanX = clampedPanX;
+                sensorPanY = clampedPanY;
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && zoomRatioRange != null && clampedZoom < 1.0f) {
                 if (currentCameraCharacteristics != null) {
                     android.graphics.Rect activeArray = currentCameraCharacteristics
@@ -834,9 +863,9 @@ public class RecordingService extends Service {
                     int maxOffX = (sensorW - cropW) / 2;
                     int maxOffY = (sensorH - cropH) / 2;
 
-                    // Crop centre with pan offset
-                    int cx = activeArray.left + sensorW / 2 + Math.round(clampedPanX * maxOffX);
-                    int cy = activeArray.top  + sensorH / 2 + Math.round(clampedPanY * maxOffY);
+                    // Crop centre with pan offset (pan already rotated into sensor space)
+                    int cx = activeArray.left + sensorW / 2 + Math.round(sensorPanX * maxOffX);
+                    int cy = activeArray.top  + sensorH / 2 + Math.round(sensorPanY * maxOffY);
 
                     int cropLeft  = Math.max(activeArray.left,  cx - cropW / 2);
                     int cropTop   = Math.max(activeArray.top,   cy - cropH / 2);
@@ -907,16 +936,42 @@ public class RecordingService extends Service {
             return;
         }
 
-        // Metering regions require sensor coordinates. We'll map normalized preview
-        // coords to - if available - active array size.
+        // Metering regions require sensor coordinates. The tap arrives in display
+        // space (upright preview), so rotate it into the sensor's coordinate space
+        // first — otherwise the focus/metering region lands at a transposed location
+        // on rotated (portrait) sensors.
         Rect activeArray = currentCameraCharacteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
         if (activeArray == null) {
             FLog.w(TAG, "Cannot perform tap-to-focus: active array size not available");
             return;
         }
 
-        int x = activeArray.left + (int) (nx * activeArray.width());
-        int y = activeArray.top + (int) (ny * activeArray.height());
+        float sensorNX = nx;
+        float sensorNY = ny;
+        try {
+            switch (getDisplayToSensorRotation()) {
+                case 90:
+                    sensorNX = ny;
+                    sensorNY = 1f - nx;
+                    break;
+                case 180:
+                    sensorNX = 1f - nx;
+                    sensorNY = 1f - ny;
+                    break;
+                case 270:
+                    sensorNX = 1f - ny;
+                    sensorNY = nx;
+                    break;
+                default:
+                    break; // 0°
+            }
+        } catch (Exception e) {
+            sensorNX = nx;
+            sensorNY = ny;
+        }
+
+        int x = activeArray.left + (int) (sensorNX * activeArray.width());
+        int y = activeArray.top + (int) (sensorNY * activeArray.height());
 
         // Clamp coordinates to active array bounds before creating rectangle
         // This prevents IllegalArgumentException when normalized coords go out of bounds (>1.0)
@@ -1423,6 +1478,24 @@ public class RecordingService extends Service {
             } else {
                 FLog.w(TAG, "TAP_TO_FOCUS intent missing coordinates");
             }
+            return START_STICKY;
+        } else if (Constants.INTENT_ACTION_SET_AUDIO_MUTED.equals(action)) {
+            // Realtime mute/unmute of the live recording's audio track.
+            boolean muted = intent.getBooleanExtra(Constants.EXTRA_AUDIO_MUTED, false);
+            if (glRecordingPipeline != null) {
+                glRecordingPipeline.setAudioMuted(muted);
+            } else {
+                FLog.w(TAG, "Audio mute: no active GL pipeline");
+            }
+            return START_STICKY;
+        } else if (Constants.INTENT_ACTION_SET_VIDEO_STABILIZATION.equals(action)) {
+            // Toggle video stabilization (EIS/OIS) at runtime.
+            boolean enable = intent.getBooleanExtra(
+                    Constants.EXTRA_VIDEO_STABILIZATION_ENABLED, true);
+            if (sharedPreferencesManager != null) {
+                sharedPreferencesManager.setVideoStabilizationEnabled(enable);
+            }
+            reapplyVideoStabilizationToSession();
             return START_STICKY;
         } else if (Constants.INTENT_ACTION_SET_ZOOM_RATIO.equals(action)) {
             if (intent.hasExtra(Constants.EXTRA_ZOOM_RATIO)) {
@@ -2539,11 +2612,6 @@ public class RecordingService extends Service {
         if (!motionLabEnabledForSession) {
             return;
         }
-        // Keep combination safe for first rollout.
-        if (targetFrameRate >= 60) {
-            disableMotionLabForSession("unsupported_high_fps_" + targetFrameRate);
-            return;
-        }
         Surface surface = getOrCreateMotionAnalysisSurface();
         if (surface != null) {
             surfaces.add(surface);
@@ -2578,9 +2646,16 @@ public class RecordingService extends Service {
             Size selected = sharedPreferencesManager != null
                     ? sharedPreferencesManager.getCameraResolution()
                     : Constants.DEFAULT_VIDEO_RESOLUTION;
-            int divisor = motionSafeMode ? 6 : (motionOpenCvActive ? 1 : 2);
-            int maxWidth = motionSafeMode ? 192 : (motionOpenCvActive ? 1280 : 640);
-            int maxHeight = motionSafeMode ? 108 : (motionOpenCvActive ? 720 : 360);
+            // Scale divisor with recording resolution: MOG2 and EfficientDet both work
+            // fine at lower resolutions, but the camera ISP has to produce YUV frames
+            // for the analysis surface, which can starve the encoder at high res+fps.
+            int recordingHeight = selected.getHeight();
+            int divisor = motionSafeMode ? 6
+                    : (motionOpenCvActive
+                        ? (recordingHeight >= 2160 ? 4 : (recordingHeight >= 1080 ? 3 : 1))
+                        : 2);
+            int maxWidth = motionSafeMode ? 192 : (motionOpenCvActive ? 640 : 640);
+            int maxHeight = motionSafeMode ? 108 : (motionOpenCvActive ? 360 : 360);
             int width = Math.max(96, Math.min(maxWidth, selected.getWidth() / divisor));
             int height = Math.max(54, Math.min(maxHeight, selected.getHeight() / divisor));
             boolean recreate = motionAnalysisReader == null
@@ -2597,7 +2672,16 @@ public class RecordingService extends Service {
                             return;
                         }
                         long now = SystemClock.elapsedRealtime();
-                        if (now - lastMotionAnalysisTimestampMs < motionAnalysisIntervalMs) {
+                        // When the motion state has been IDLE (no motion for a while), throttle analysis
+                        // to 1 fps to save power and reduce heat.  Cameras with a third output surface
+                        // (analysis YUV) keep the ISP active even when nothing is recording.
+                        long effectiveIntervalMs = motionAnalysisIntervalMs;
+                        if (motionStateMachine != null
+                                && motionStateMachine.getState() == com.fadcam.motion.domain.state.MotionSessionState.IDLE
+                                && recordingState == RecordingState.PAUSED) {
+                            effectiveIntervalMs = Math.max(effectiveIntervalMs, 1000L);
+                        }
+                        if (now - lastMotionAnalysisTimestampMs < effectiveIntervalMs) {
                             return;
                         }
                         lastMotionAnalysisTimestampMs = now;
@@ -2695,7 +2779,8 @@ public class RecordingService extends Service {
         if (motionStateMachine != null && sharedPreferencesManager != null) {
             com.fadcam.motion.domain.model.MotionSettings settings = new com.fadcam.motion.domain.model.MotionSettings(
                     sharedPreferencesManager.isMotionModeEnabled(),
-                    com.fadcam.motion.domain.model.MotionTriggerMode.ANY_MOTION,
+                    com.fadcam.motion.domain.model.MotionTriggerMode.fromValue(
+                            sharedPreferencesManager.getMotionTriggerMode()),
                     sharedPreferencesManager.getMotionSensitivity(),
                     sharedPreferencesManager.getMotionAnalysisFps(),
                     sharedPreferencesManager.getMotionDebounceMs(),
@@ -3026,7 +3111,8 @@ public class RecordingService extends Service {
         if (watermarkText == null) {
             watermarkText = "";
         }
-        watermarkText = watermarkText.replace("\n", " ").replace("\r", " ").replace("||wm||", " ");
+        // Only sanitize the separator token; preserve newlines for proper watermark layout
+        watermarkText = watermarkText.replace("||wm||", " ");
 
         return "__DF_OVERLAY__:" + payload
                 + "||wm||" + watermarkText;
@@ -3220,6 +3306,7 @@ public class RecordingService extends Service {
         if (frameJpeg != null && frameJpeg.length > 0) {
             debugIntent.putExtra(Constants.EXTRA_MOTION_DEBUG_FRAME_JPEG, frameJpeg);
         }
+        debugIntent.setPackage(getPackageName());
         sendBroadcast(debugIntent);
     }
 
@@ -3267,7 +3354,11 @@ public class RecordingService extends Service {
         if (!shouldEmitDebugFrame) {
             return false;
         }
-        return sharedPreferencesManager != null && sharedPreferencesManager.isMotionDebugUiActive();
+        // Always encode the JPEG when a debug broadcast is due; the broadcast receiver
+        // is only registered while MotionLabSettingsFragment is on-screen, so the
+        // frame data is only consumed when the UI is visible.  The 900 ms throttle
+        // in maybeBroadcastMotionDebug already bounds encoding frequency.
+        return sharedPreferencesManager != null;
     }
 
     private int getCurrentSensorOrientationDegrees() {
@@ -3276,6 +3367,33 @@ public class RecordingService extends Service {
         }
         Integer so = currentCameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
         return so == null ? 90 : so;
+    }
+
+    /**
+     * Rotation (0/90/180/270) that maps a display-space point/vector into the
+     * sensor's coordinate space, accounting for the sensor's mounting rotation,
+     * the current device rotation, and the front-camera flip. Used to translate
+     * touch input (pan, tap-to-focus) into SCALER_CROP_REGION / metering region
+     * coordinates.
+     */
+    private int getDisplayToSensorRotation() {
+        int displayRotationDeg = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            android.view.WindowManager wm = (android.view.WindowManager)
+                    getSystemService(Context.WINDOW_SERVICE);
+            if (wm != null && wm.getDefaultDisplay() != null) {
+                displayRotationDeg = 90 * wm.getDefaultDisplay().getRotation();
+            }
+        }
+        int total = (getCurrentSensorOrientationDegrees() + displayRotationDeg) % 360;
+        if (currentCameraCharacteristics != null) {
+            Integer facing = currentCameraCharacteristics.get(
+                    CameraCharacteristics.LENS_FACING);
+            if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                total = (360 - total) % 360;
+            }
+        }
+        return total % 360;
     }
 
     private boolean shouldMirrorForensicsSnapshots() {
@@ -5867,11 +5985,94 @@ public class RecordingService extends Service {
                 } else {
                     FLog.w(TAG, "AF modes not available from camera characteristics");
                 }
+
+                // Video stabilization (EIS + OIS). Safe no-op when unsupported.
+                applyVideoStabilization(builder);
             } else {
                 FLog.e(TAG, "applySavedCameraPrefsToBuilder: currentCameraCharacteristics is null!");
             }
         } catch (Exception e) {
             FLog.w(TAG, "Error applying camera prefs: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Applies video stabilization (EIS + OIS) to the capture request when the
+     * user preference is enabled AND the hardware exposes the mode. Never
+     * throws — every failure path falls back to stabilization OFF so a quirky
+     * HAL can never take the camera down.
+     *
+     * Tagged "FadCamEIS" for logcat grepping to verify the feature is active.
+     */
+    private void applyVideoStabilization(CaptureRequest.Builder builder) {
+        try {
+            if (builder == null || currentCameraCharacteristics == null) {
+                FLog.w("FadCamEIS", "applyVideoStabilization skipped (builder/chars null)");
+                return;
+            }
+            boolean prefEnabled = sharedPreferencesManager != null
+                    && sharedPreferencesManager.isVideoStabilizationEnabled();
+
+            boolean eisSupported = false;
+            int[] stabModes = currentCameraCharacteristics.get(
+                    CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES);
+            if (stabModes != null) {
+                for (int m : stabModes) {
+                    if (m == CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON) {
+                        eisSupported = true;
+                        break;
+                    }
+                }
+            }
+            int eisMode = (prefEnabled && eisSupported)
+                    ? CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_ON
+                    : CameraMetadata.CONTROL_VIDEO_STABILIZATION_MODE_OFF;
+            builder.set(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, eisMode);
+
+            boolean oisSupported = false;
+            int[] oisModes = currentCameraCharacteristics.get(
+                    CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION);
+            if (oisModes != null) {
+                for (int m : oisModes) {
+                    if (m == CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_ON) {
+                        oisSupported = true;
+                        break;
+                    }
+                }
+            }
+            int oisMode = (prefEnabled && oisSupported)
+                    ? CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_ON
+                    : CameraMetadata.LENS_OPTICAL_STABILIZATION_MODE_OFF;
+            builder.set(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE, oisMode);
+
+            FLog.i("FadCamEIS", "VideoStab applied -> pref=" + prefEnabled
+                    + " eisSupported=" + eisSupported + " eis=" + eisMode
+                    + " oisSupported=" + oisSupported + " ois=" + oisMode
+                    + " cameraId=" + (cameraDevice != null ? cameraDevice.getId() : "null"));
+        } catch (Throwable t) {
+            // Catch Throwable: a stabilization bug must never crash the recorder.
+            FLog.w("FadCamEIS", "applyVideoStabilization failed, falling back to OFF: " + t.getMessage());
+        }
+    }
+
+    /**
+     * Re-applies the current stabilization preference to an already-running
+     * session (e.g. after the user toggles it in Settings mid-recording).
+     * Fully guarded — never throws.
+     */
+    private void reapplyVideoStabilizationToSession() {
+        try {
+            if (captureSession == null || captureRequestBuilder == null
+                    || cameraDevice == null || isStopping) {
+                FLog.w("FadCamEIS", "reapply skipped (session/builder/device not ready)");
+                return;
+            }
+            applyVideoStabilization(captureRequestBuilder);
+            captureSession.setRepeatingRequest(
+                    captureRequestBuilder.build(), null, backgroundHandler);
+            FLog.i("FadCamEIS", "Repeating request re-issued with new stabilization state");
+        } catch (Throwable t) {
+            FLog.w("FadCamEIS", "reapplyVideoStabilizationToSession failed safely: " + t.getMessage());
         }
     }
 

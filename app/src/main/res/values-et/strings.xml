@@ -749,7 +749,8 @@
     <string name="row_orientation_title">Suund</string>
     <string name="row_record_audio_title">Salvesta heli</string>
     <string name="row_input_source_title">Sisendallikas</string>
-    <string name="row_noise_suppression_title">Mürasummutus</string>
+    <string name="row_raw_audio_title">Toores heli</string>
+    <string name="raw_audio_banner">Täielikult töötlemata heli pole sellel seadmel saadaval</string>
     <string name="settings_location_watermark_title">Asukoha vesimärk</string>
     <string name="delete_all_videos_title">Kustuta kõik videod</string>
     <string name="delete_all_videos_description">Kas oled kindel, et soovid kõik videod kustutada?</string>
@@ -972,6 +973,14 @@
     <string name="shortcuts_picture_category">Pilt</string>
     <string name="preview_quick_actions_title">Eelvaate kiirtoimingud</string>
     <string name="preview_quick_actions_sub">Kuva FadShot ja täisekraani ikoonid isegi siis, kui salvestamine on ootel.</string>
+    <string name="grid_lines_title">Ruudustiku jooned</string>
+    <string name="home_icon_picker_title">Avakuva ikoon</string>
+    <string name="home_icon_home">Avakuva</string>
+    <string name="home_icon_jet">Hävituslennuk</string>
+    <string name="home_icon_pilot">Piloot</string>
+    <string name="quick_mute_label">Vaigista</string>
+    <string name="quick_unmute_label">Heli sisse</string>
+    <string name="grid_lines_subtitle">Kolmikute ruudustik eelvaates</string>
     <string name="preview_quick_actions_state_always">Alati nähtav (ootel + salvestamisel)</string>
     <string name="preview_quick_actions_state_recording_only">Nähtav ainult salvestamise ajal</string>
     <string name="warning_temp_file_detail">
@@ -1185,7 +1194,7 @@
 Soovitatav: 192000 bps, 48000 Hz enamikele kasutajatele.</string>
     <string name="helper_record_audio">Lülita mikrofoni heli salvestamine videotesse.</string>
     <string name="helper_audio_input_source">Vali, millist ühendatud mikrofoni/sisendit kasutada.</string>
-    <string name="helper_noise_suppression">Eksperimentaalne filter taustamüra vähendamiseks.</string>
+    <string name="helper_raw_audio">Salvestab mikrofoni toore heli ilma telefoni automaatse mürasummutuse ja helitugevuse tasakaalustamiseta. Suurepärane, kui plaanite heli hiljem ise redigeerida. Kehtib uute salvestiste kohta.</string>
     <string name="helper_audio_advanced">Kohanda bitikiirust ja diskreetimissagedust kvaliteedi/suuruse tasakaalu jaoks.</string>
     <string name="helper_audio_bitrate_detail">Soovitatav: 192000 bps kõrgekvaliteedilise stereo jaoks. Madalamad väärtused vähendavad faili suurust, kuid võivad vähendada selgust. Vahemik 64000–384000 bps.</string>
     <string name="helper_audio_sampling_detail">Vali 48000 Hz video jaoks (soovitatav) või 44100 Hz üldise heli ühilduvuse jaoks.</string>
@@ -1199,6 +1208,9 @@ Soovitatav: 192000 bps, 48000 Hz enamikele kasutajatele.</string>
     <string name="helper_location_watermark">Lisab reaalajas asukoha teksti ülekatte salvestamise ajal.</string>
     <string name="helper_location_embed">Lisab GPS-koordinaadid video metaandmetesse (geosilt).</string>
     <string name="video_setting_location_embed_title">Lisa asukoha metaandmed</string>
+    <string name="setting_video_stabilization_title">Videostabiliseerimine</string>
+    <string name="setting_not_supported">Selles seadmes ei toetata</string>
+    <string name="video_stabilization_footer">Hoiab videod stabiilsena, kompenseerides käe värinat elektroonilise (EIS) ja optilise (OIS) stabiliseerimisega. Selleks kärbitakse kaadrit veidi.</string>
     <string name="video_setting_location_embed_enabled">Lubatud</string>
     <string name="video_setting_location_embed_disabled">Keelatud</string>
     <string name="helper_watermark_option">Vali ülekatte sisu: ajatempel + bränd, ainult ajatempel või puudub.</string>
@@ -1735,7 +1747,7 @@ Soovitatav: 192000 bps, 48000 Hz enamikele kasutajatele.</string>
     <string name="camera_error_service">Kaamera teenuse viga</string>
     <string name="camera_error_unknown">Tundmatu kaamera viga</string>
     <string name="camera_resources_cooldown">Palun oota hetk enne uue salvestamise alustamist</string>
-    <string name="dialog_audio_noise_suppression_label">Mürasummutus</string>
+    <string name="raw_audio_unprocessed_note">Täielikult töötlemata heli pole sellel seadmel saadaval. Selle asemel kasutatakse hääletuvastuse mikrofonirežiimi (VOICE_RECOGNITION), mis keelab suurema osa töötlusest — erinevus tavasalvestusest võib olla väike.</string>
     <string name="fix_video_menu_title">Paranda video (taasta esitus)</string>
     <string name="fix_video_repairing">Parandan… See võib võtta mõne sekundi.</string>
     <string name="fix_video_success">Video parandatud! Salvestatud kui: %1$s</string>
@@ -1976,6 +1988,10 @@ Sujuvama esitamise kogemuse jaoks saad kasutada välist esitajat nagu VLC. Siisk
     <string name="motion_lab_row_subtitle">Tark sündmuse salvestamine CCTV-stiilis kasutamiseks</string>
     <string name="automation_title">Automaatika</string>
     <string name="automation_row_subtitle">Nuppude sidumine, Bluetooth-puldid, helitugevusklahvid</string>
+    <string name="setting_volume_shutter_title">Helitugevusklahvi päästik</string>
+    <string name="setting_volume_shutter_summary">Helitugevusklahvid toimivad avakuval kaamera päästikutena</string>
+    <string name="setting_volume_shutter_footer">Helitugevusklahvid saavad avakuval teie päästikuteks:\n• Puudutus — foto tegemine\n• Topeltpuudutus — kaamera vahetamine\n• Pikk vajutus — salvestuse alustamine või lõpetamine\n\nBluetooth-kaugpäästikud töötavad samuti ja käivitavad samu toiminguid. Klahvid töötavad, kui FadCami avakuva on avatud — tulevased versioonid võimaldavad mis tahes nupul käivitada FadCami toiminguid ka taustal.\n\nKasutage praegu MacroDroidi FadCami otseteede määramiseks — leiate need Seadetes → Otseteed ja vidinad.</string>
+    <string name="shortcuts_macrodroid_template">MacroDroidi ametlik mall: https://templates.macrodroid.com/view/28194</string>
     <string name="thermal_guardian_title">Soojuskaitse</string>
     <string name="thermal_guardian_row_subtitle">Kohanda salvestust automaatselt, et vältida ülekuumenemist</string>
     <string name="audio_vision_title">Helinägemine</string>

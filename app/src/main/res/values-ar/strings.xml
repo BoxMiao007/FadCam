@@ -474,7 +474,7 @@
     <string name="video_menu_upload_drive">تحميل على Google Drive</string>
     <string name="toast_no_youtube_app">لم يتم العثور على تطبيق YouTube</string>
     <string name="toast_no_drive_app">لم يتم العثور على تطبيق Google Drive</string>
-    <string name="dialog_audio_noise_suppression_label">تثبيط الضوضاء</string>
+    <string name="raw_audio_unprocessed_note">الصوت الخام بالكامل غير متاح على هذا الجهاز. يُستخدم بدلاً منه وضع ميكروفون التعرف على الصوت (VOICE_RECOGNITION)، الذي يعطّل معظم المعالجة — قد يكون الفرق عن التسجيل العادي طفيفًا.</string>
     <string name="fix_video_menu_title">إصلاح الفيديو (إصلاح التشغيل)</string>
     <string name="fix_video_repairing">جاري الإصلاح… قد يستغرق ذلك بضع ثوانٍ.</string>
     <string name="fix_video_success">تم إصلاح الفيديو! تم الحفظ باسم: %1$s</string>
@@ -1555,7 +1555,8 @@
 
     <string name="row_input_source_title">مصدر الإدخال</string>
 
-    <string name="row_noise_suppression_title">تثبيط الضوضاء</string>
+    <string name="row_raw_audio_title">صوت خام</string>
+    <string name="raw_audio_banner">الصوت الخام بالكامل غير متاح على هذا الجهاز</string>
 
     <string name="settings_location_watermark_title">علامة الموقع المائية</string>
 
@@ -1961,6 +1962,14 @@
     <string name="preview_quick_actions_title">إجراءات المعاينة السريعة</string>
 
     <string name="preview_quick_actions_sub">إظهار أيقونات FadShot والشاشة الكاملة حتى عندما يكون التسجيل خاملاً.</string>
+    <string name="grid_lines_title">خطوط الشبكة</string>
+    <string name="home_icon_picker_title">أيقونة الرئيسية</string>
+    <string name="home_icon_home">الرئيسية</string>
+    <string name="home_icon_jet">طائرة مقاتلة</string>
+    <string name="home_icon_pilot">طيار</string>
+    <string name="quick_mute_label">كتم</string>
+    <string name="quick_unmute_label">إلغاء الكتم</string>
+    <string name="grid_lines_subtitle">شبكة الأثلاث على المعاينة</string>
 
     <string name="preview_quick_actions_state_always">مرئية دائمًا (خامل + تسجيل)</string>
 
@@ -2320,7 +2329,7 @@
 
     <string name="helper_audio_input_source">اختر أي ميكروفون/مدخل متصل لاستخدامه.</string>
 
-    <string name="helper_noise_suppression">فلتر تجريبي لتقليل الضوضاء الخلفية.</string>
+    <string name="helper_raw_audio">يلتقط الصوت الخام من الميكروفون دون تقليل الضوضاء وموازنة الصوت التلقائيين من الهاتف. مثالي إذا كنت تخطط لتحرير الصوت بنفسك لاحقًا. يسري على التسجيلات الجديدة.</string>
 
     <string name="helper_audio_advanced">تخصيص معدل البت ومعدل أخذ العينات لتوازن الجودة/الحجم.</string>
 
@@ -2347,6 +2356,9 @@
     <string name="helper_location_embed">يضمّن إحداثيات GPS في بيانات الفيديو الوصفية (geotag).</string>
 
     <string name="video_setting_location_embed_title">تضمين بيانات الموقع الوصفية</string>
+    <string name="setting_video_stabilization_title">تثبيت الفيديو</string>
+    <string name="setting_not_supported">غير مدعوم على هذا الجهاز</string>
+    <string name="video_stabilization_footer">يثبّت مقاطع الفيديو بمعادلة اهتزاز اليد باستخدام التثبيت الإلكتروني (EIS) والبصري (OIS). يتطلب ذلك اقتصاصًا طفيفًا للإطار.</string>
 
     <string name="video_setting_location_embed_enabled">مفعّل</string>
 
@@ -3436,6 +3448,10 @@
 
     <string name="automation_title">أتمتة</string>
     <string name="automation_row_subtitle">ربط الأزرار، أجهزة التحكم عن بعد بلوتوث، أزرار الصوت</string>
+    <string name="setting_volume_shutter_title">مصراع أزرار الصوت</string>
+    <string name="setting_volume_shutter_summary">تعمل أزرار الصوت كشتر للكاميرا في علامة التبويب الرئيسية</string>
+    <string name="setting_volume_shutter_footer">أزرار الصوت تصبح شتر الكاميرا في علامة التبويب الرئيسية:\n• نقرة — التقاط صورة\n• نقرة مزدوجة — تبديل الكاميرا\n• ضغطة مطولة — بدء أو إيقاف التسجيل\n\nأجهزة البلوتوث عن بُعد تعمل أيضًا وتُفعّل نفس الإجراءات. الأزرار تعمل أثناء فتح علامة التبويب الرئيسية لتطبيق FadCam — الإصدارات المستقبلية ستسمح لأي زر بتفعيل إجراءات FadCam حتى في الخلفية.\n\nحاليًا، استخدم MacroDroid لربط اختصارات FadCam — ستجدها في الإعدادات ← الاختصارات والأدوات.</string>
+    <string name="shortcuts_macrodroid_template">قالب MacroDroid الرسمي: https://templates.macrodroid.com/view/28194</string>
 
     <string name="thermal_guardian_title">الوصي الحراري</string>
     <string name="thermal_guardian_row_subtitle">ضبط التسجيل تلقائياً لمنع ارتفاع الحرارة</string>

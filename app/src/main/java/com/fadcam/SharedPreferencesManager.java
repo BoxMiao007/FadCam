@@ -352,6 +352,87 @@ public class SharedPreferencesManager {
             .apply();
     }
 
+    /**
+     * Whether video stabilization (EIS/OIS) should be requested. Defaults to ON.
+     * The capture pipeline independently verifies hardware support and silently
+     * falls back to OFF on devices that don't expose stabilization modes.
+     */
+    public boolean isVideoStabilizationEnabled() {
+        return sharedPreferences.getBoolean(
+            Constants.PREF_VIDEO_STABILIZATION_ENABLED,
+            true
+        );
+    }
+
+    public void setVideoStabilizationEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(Constants.PREF_VIDEO_STABILIZATION_ENABLED, enabled)
+            .apply();
+    }
+
+    /**
+     * Whether raw (unprocessed) audio capture is requested. Defaults to OFF,
+     * which uses the platform-processed CAMCORDER source (built-in noise
+     * suppression + AGC). When ON the pipeline records the unprocessed
+     * microphone signal (UNPROCESSED, falling back to VOICE_RECOGNITION).
+     */
+    public boolean isRawAudioEnabled() {
+        return sharedPreferences.getBoolean(
+            Constants.PREF_RAW_AUDIO_ENABLED,
+            false
+        );
+    }
+
+    public void setRawAudioEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(Constants.PREF_RAW_AUDIO_ENABLED, enabled)
+            .apply();
+    }
+
+    /** Realtime audio mute state for the home quick action (default off = audio on). */
+    public boolean isAudioMuted() {
+        return sharedPreferences.getBoolean(Constants.PREF_AUDIO_MUTED, false);
+    }
+
+    public void setAudioMuted(boolean muted) {
+        sharedPreferences
+            .edit()
+            .putBoolean(Constants.PREF_AUDIO_MUTED, muted)
+            .apply();
+    }
+
+    /** Home nav icon choice — default is the pilot icon. */
+    public String getHomeIcon() {
+        return sharedPreferences.getString(
+            Constants.PREF_HOME_ICON,
+            Constants.HOME_ICON_PILOT
+        );
+    }
+
+    public void setHomeIcon(String choice) {
+        sharedPreferences
+            .edit()
+            .putString(Constants.PREF_HOME_ICON, choice)
+            .apply();
+    }
+
+    /** Quick-action button order as comma-separated tokens (e.g. "mute,full,fadshot"). */
+    public String getQuickActionsOrder() {
+        return sharedPreferences.getString(
+            Constants.PREF_QUICK_ACTIONS_ORDER,
+            Constants.DEFAULT_QUICK_ACTIONS_ORDER
+        );
+    }
+
+    public void setQuickActionsOrder(String order) {
+        sharedPreferences
+            .edit()
+            .putString(Constants.PREF_QUICK_ACTIONS_ORDER, order)
+            .apply();
+    }
+
     public Size getCameraResolution() {
         return new Size(
             sharedPreferences.getInt(
@@ -832,6 +913,23 @@ public class SharedPreferencesManager {
             .apply();
     }
 
+    // -------------- Volume shutter (volume keys as camera shutter) --------------
+    /** Returns whether volume keys act as a shutter while the home screen is open. Default: true. */
+    public boolean isVolumeShutterEnabled() {
+        return sharedPreferences.getBoolean(
+            Constants.PREF_VOLUME_SHUTTER_ENABLED,
+            true
+        );
+    }
+
+    /** Sets whether volume keys act as a shutter while the home screen is open. */
+    public void setVolumeShutterEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(Constants.PREF_VOLUME_SHUTTER_ENABLED, enabled)
+            .apply();
+    }
+
     // -------------- Background playback auto-stop timer (in seconds) --------------
     /** Returns the auto-stop time in seconds. 0 = disabled. Default: 0. */
     public int getBackgroundPlaybackTimerSeconds() {
@@ -1220,6 +1318,21 @@ public class SharedPreferencesManager {
         sharedPreferences
             .edit()
             .putBoolean(Constants.PREF_IS_PREVIEW_ENABLED, isEnabled)
+            .apply();
+    }
+
+    // Rule-of-thirds grid overlay on the preview (default off)
+    public boolean isGridLinesEnabled() {
+        return sharedPreferences.getBoolean(
+            Constants.PREF_GRID_LINES_ENABLED,
+            false
+        );
+    }
+
+    public void setGridLinesEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(Constants.PREF_GRID_LINES_ENABLED, enabled)
             .apply();
     }
 
@@ -1904,20 +2017,6 @@ public class SharedPreferencesManager {
 
     public static final String PREF_AUDIO_NOISE_SUPPRESSION =
         "audio_noise_suppression";
-
-    public boolean isNoiseSuppressionEnabled() {
-        return sharedPreferences.getBoolean(
-            PREF_AUDIO_NOISE_SUPPRESSION,
-            false
-        );
-    }
-
-    public void setNoiseSuppressionEnabled(boolean enabled) {
-        sharedPreferences
-            .edit()
-            .putBoolean(PREF_AUDIO_NOISE_SUPPRESSION, enabled)
-            .apply();
-    }
 
     /**
      * Returns the current video bitrate in bps, using custom or default as set in
