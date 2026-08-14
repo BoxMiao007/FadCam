@@ -13,6 +13,8 @@ public abstract class Constants {
 
     public static final String PREF_VIDEO_RESOLUTION_WIDTH =
         "video_resolution_width";
+    public static final String PREF_RECORDS_SORT = "records_sort_option"; // LATEST_FIRST|OLDEST_FIRST|SMALLEST_FILES|LARGEST_FILES
+    public static final String PREF_RECORDS_GRID_SPAN = "records_grid_span"; // 1|2|3|4|5
     public static final String PREF_VIDEO_RESOLUTION_HEIGHT =
         "video_resolution_height";
     public static final String PREF_VIDEO_FRAME_RATE = "video_frame_rate";
@@ -74,6 +76,7 @@ public abstract class Constants {
     public static final String PREF_WATERMARK_WEATHER = "watermark_weather_enabled";
     public static final String PREF_WATERMARK_NETWORK_WARNING_SHOWN = "watermark_network_warning_shown";
     public static final String PREF_WATERMARK_TIMEZONE = "watermark_timezone_enabled";
+    public static final String PREF_WATERMARK_DAY = "watermark_day_enabled";
     public static final String PREF_WATERMARK_TIMEZONE_FORMAT = "watermark_timezone_format";
     public static final String PREF_WATERMARK_UTM = "watermark_utm_enabled";
     public static final String PREF_WATERMARK_ACCURACY = "watermark_accuracy_enabled";
@@ -623,7 +626,7 @@ public abstract class Constants {
     public static final String APP_ICON_PALESTINE = "palestine"; // Sumud icon
     public static final String APP_ICON_PAKISTAN = "pakistan"; // MadeInPK icon
     public static final String APP_ICON_FADSECLAB = "fadseclab"; // r00t icon
-    public static final String APP_ICON_NOOR = "noor"; // Noor icon
+    public static final String APP_ICON_NOORISTIC = "nooristic"; // Nooristic icon
     public static final String APP_ICON_BAT = "bat"; // FadBat icon
     public static final String APP_ICON_REDBINARY = "redbinary"; // RedBinary icon
     public static final String APP_ICON_NOTES = "notes"; // Notes icon

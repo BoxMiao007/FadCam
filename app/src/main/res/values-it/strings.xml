@@ -136,9 +136,24 @@
     <!-- FadRec audio source picker -->
     <string name="fadrec_audio_source_title">Fonte audio</string>
     <string name="fadrec_audio_source_choose">Scegli fonte audio</string>
+
+	<string name="fadrec_audio_source_helper">Scegli quale audio catturano le registrazioni dello schermo. \"Predefinito (routing di sistema)\" è consigliato per microfoni USB e cablati — oppure scegli un dispositivo specifico per un routing esplicito.</string>
+	<string name="fadrec_audio_source_mic_default">Microfono (routing predefinito)</string>
     <string name="fadrec_audio_source_none">Nessun audio</string>
     <string name="fadrec_audio_source_mic">Microfono</string>
     <string name="fadrec_audio_source_internal">Audio dispositivo (interno)</string>
+
+	<string name="screen_rec_audio_device_title">Dispositivo di ingresso audio</string>
+	<string name="screen_rec_audio_device_default">Predefinito (routing di sistema)</string>
+	<string name="screen_rec_audio_device_helper">Scegli il microfono con cui vengono registrate le registrazioni dello schermo. \"Predefinito\" usa il routing automatico di sistema: l\'opzione affidabile con i microfoni USB.</string>
+
+    <string name="records_repair_banner_dismiss">Chiudi</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s non è stato finalizzato al termine della registrazione. È stato convertito automaticamente in un formato riproducibile.</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s non era riproducibile perché la registrazione è stata interrotta mentre l\'app era in background. È stato convertito automaticamente in un formato riproducibile.</string>
+
+    <string name="records_repair_banner_title">Registrazione riparata</string>
 
     <string name="video_recording_started">Registrazione avviata</string>
     <string name="video_recording_stopped">Registrazione interrotta</string>
@@ -249,6 +264,7 @@
     <string name="tips_title">Suggerimenti</string>
     <string name="tips_subtitle">Suggerimenti utili per l\'utilizzo</string>
     <string name="whats_new_title">Novità</string>
+    <string name="whats_new_no_browser">Nessuna app trovata per aprire questo link</string>
     <string name="whats_new_subtitle">Scopri le ultime funzionalità e aggiornamenti</string>
     <string name="home_menu">Menu Home</string>
     <string name="home_sidebar_title">Home</string>
@@ -843,7 +859,8 @@
     <string name="shortcuts_helper_text">Aggiungi scorciatoie delle azioni alla schermata home.</string>
     <string name="shortcuts_add_to_home">Aggiungi alla home</string>
     <string name="shortcuts_sheet_helper">Scegli un\'azione e tocca Aggiungi alla Home. Puoi anche rinominare la scorciatoia o cambiarne l\'icona.</string>
-    <string name="shortcuts_and_widgets">Scorciatoie e widget</string>
+    <string name="shortcuts_widgets_screen_title">Scorciatoie e widget</string>
+    <string name="shortcuts_and_widgets">Widget</string>
     <string name="video_player_settings_title">Impostazioni lettore video</string>
     <string name="video_player_settings_helper">Personalizza l\'esperienza del lettore video.</string>
     <string name="video_player_settings_subtitle">Velocità, audio, controlli</string>
@@ -937,6 +954,7 @@
     <string name="shortcut_purpose_start_current">Avvia fotocamera corrente</string>
     <string name="shortcut_purpose_start_dual">Avvia doppia</string>
     <string name="shortcut_purpose_stop">Ferma</string>
+    <string name="shortcut_purpose_toggle">Una singola scorciatoia dinamica che avvia o ferma la registrazione usando la fotocamera predefinita — usa le scorciatoie Avvia e Ferma separate per il controllo manuale.</string>
     <string name="shortcut_purpose_torch">Torcia</string>
     <string name="shortcut_purpose_photo">Scatta foto</string>
     <string name="shortcut_purpose_photo_front">Scatta selfie</string>
@@ -961,6 +979,8 @@
     <string name="shortcut_start_back">Avvia posteriore</string>
     <string name="shortcut_start_front">Avvia frontale</string>
     <string name="shortcut_start_current">Avvia fotocamera corrente</string>
+    <string name="shortcut_toggle_recording">Avvia / Ferma</string>
+    <string name="shortcut_toggle_recording_long">Avvia o ferma la registrazione</string>
     <string name="shortcut_start_dual">Avvia doppia</string>
     <string name="stop_recording">Ferma registrazione</string>
     <string name="shortcut_take_photo">Scatta foto</string>
@@ -2094,6 +2114,7 @@
     <string name="watermark_gps_disabled_warning">GPS disabilitato</string>
     <string name="watermark_gps_disabled_home_toast">Abilita GPS per posizione</string>
     <string name="watermark_gps_disabled_banner_message">Il GPS è spento.</string>
+    <string name="watermark_day_title">Giorno</string>
     <string name="watermark_timezone_title">Fuso orario</string>
     <string name="watermark_timezone_off">Spento</string>
     <string name="watermark_timezone_on_gmt">GMT</string>
@@ -2237,13 +2258,13 @@
     <string name="eye_color_magenta" translatable="false">Magenta</string>
     <string name="header_logo_default" translatable="false">FadCam</string>
     <string name="header_logo_avatar" translatable="false">Avatar</string>
-    <string name="app_icon_default" translatable="false">Legacy</string>
+    <string name="app_icon_default" translatable="false">FadCam</string>
     <string name="app_icon_alternative" translatable="false">Camera</string>
     <string name="app_icon_faded" translatable="false">0xFF0000</string>
     <string name="app_icon_palestine" translatable="false">I❤️Palestine</string>
     <string name="app_icon_pakistan" translatable="false">FadCam</string>
     <string name="app_icon_fadseclab" translatable="false">FadSec Lab</string>
-    <string name="app_icon_noor" translatable="false">Noor</string>
+    <string name="app_icon_nooristic" translatable="false">FadCam ++</string>
     <string name="app_icon_bat" translatable="false">FadCam</string>
     <string name="app_icon_redbinary" translatable="false">$ ~/r00t</string>
     <string name="app_icon_notes" translatable="false">Notes</string>
@@ -2254,7 +2275,7 @@
     <string name="app_icon_car" translatable="false">ClutchX</string>
     <string name="app_icon_jet" translatable="false">JF-17: ThunderX</string>
     <string name="app_icon_black_alias_label" translatable="false">\u0020</string>
-    <string name="app_icon_minimal" translatable="false">Minimal</string>
+    <string name="app_icon_minimal" translatable="false">FadCam</string>
     <string name="home_sidebar_copyright" translatable="false">© FadSec Lab 2024 – 2026</string>
     <string name="export_center">Centro Esportazione</string>
 

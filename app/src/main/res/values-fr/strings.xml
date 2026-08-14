@@ -632,11 +632,26 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="fadrec_audio_source_choose">Choose audio source</string>
 
+	<string name="fadrec_audio_source_helper">Choisissez ce que les enregistrements d\'écran capturent comme audio. « Par défaut (routage système) » est recommandé pour les micros USB et filaires — ou choisissez un périphérique précis pour un routage explicite.</string>
+	<string name="fadrec_audio_source_mic_default">Microphone (routage par défaut)</string>
+
 <string name="fadrec_audio_source_none">No Audio</string>
 
 <string name="fadrec_audio_source_mic">Microphone</string>
 
 <string name="fadrec_audio_source_internal">Device Audio (Internal)</string>
+
+	<string name="screen_rec_audio_device_title">Périphérique d\'entrée audio</string>
+	<string name="screen_rec_audio_device_default">Par défaut (routage système)</string>
+	<string name="screen_rec_audio_device_helper">Choisissez le microphone utilisé par les enregistrements d\'écran. « Par défaut » utilise le routage automatique du système — l\'option fiable avec les micros USB.</string>
+
+    <string name="records_repair_banner_dismiss">Fermer</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s n\'a pas été finalisé à l\'arrêt de l\'enregistrement. Il a été converti automatiquement dans un format lisible.</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s n\'était pas lisible car l\'enregistrement a été interrompu pendant que l\'application était en arrière-plan. Il a été converti automatiquement dans un format lisible.</string>
+
+    <string name="records_repair_banner_title">Enregistrement réparé</string>
 
 <string name="recording_controls_title">AF · Exposure · Zoom</string>
 
@@ -845,6 +860,8 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 <string name="tips_subtitle">Helpful usage tips</string>
 
 <string name="whats_new_title">What\'s New</string>
+
+<string name="whats_new_no_browser">Aucune application trouvée pour ouvrir ce lien</string>
 
 <string name="whats_new_subtitle">See latest features and updates</string>
 
@@ -1673,7 +1690,9 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="shortcuts_sheet_helper">Your launcher will prompt for placement.</string>
 
-<string name="shortcuts_and_widgets">Shortcuts &amp; Widgets</string>
+<string name="shortcuts_widgets_screen_title">Shortcuts &amp; Widgets</string>
+
+<string name="shortcuts_and_widgets">Widgets</string>
 
 <string name="video_player_settings_title">Video Player Settings</string>
 
@@ -1861,6 +1880,8 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="shortcut_purpose_stop">This shortcut stops the current recording.</string>
 
+<string name="shortcut_purpose_toggle">Un raccourci dynamique unique qui démarre ou arrête l’enregistrement avec la caméra par défaut — utilisez les raccourcis Démarrer et Arrêter séparés pour un contrôle manuel.</string>
+
 <string name="shortcut_purpose_torch">This shortcut toggles the torch.</string>
 
 <string name="shortcut_purpose_photo">This shortcut captures a back camera photo and saves it to FadCam/FadShot location.</string>
@@ -1888,6 +1909,10 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 <string name="shortcut_start_front">Start Front</string>
 
 <string name="shortcut_start_current">Start Current</string>
+
+<string name="shortcut_toggle_recording">Démarrer / Arrêter</string>
+
+<string name="shortcut_toggle_recording_long">Démarrer ou arrêter l’enregistrement</string>
 
 <string name="shortcut_start_dual">Start Dual</string>
 
@@ -2448,7 +2473,7 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="header_logo_avatar" translatable="false">Avatar</string>
 
-<string name="app_icon_default" translatable="false">Legacy</string>
+<string name="app_icon_default" translatable="false">FadCam</string>
 
 <string name="app_icon_alternative" translatable="false">Camera</string>
 
@@ -2460,7 +2485,7 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="app_icon_fadseclab" translatable="false">FadSec Lab</string>
 
-<string name="app_icon_noor" translatable="false">Noor</string>
+<string name="app_icon_nooristic" translatable="false">FadCam ++</string>
 
 <string name="app_icon_bat" translatable="false">FadCam</string>
 
@@ -2851,7 +2876,7 @@ Recommandé : 192000 bps, 48000 Hz pour la plupart des utilisateurs.</string>
 
 <string name="storage_helper_current_custom_uri_prefix">URI:</string>
 
-<string name="app_icon_minimal" translatable="false">Minimal</string>
+<string name="app_icon_minimal" translatable="false">FadCam</string>
 
 <string name="onboarding_intro_line4">open-source. ad-free. yours.</string>
 
@@ -3689,6 +3714,8 @@ For the smoothest playback experience, you can use an external player like VLC. 
 <string name="watermark_gps_disabled_home_toast">Location-dependent watermark features enabled but GPS is off. Enable device location for them to work.</string>
 
 <string name="watermark_gps_disabled_banner_message">Location-dependent watermark features will not appear until device location is enabled</string>
+
+<string name="watermark_day_title">Jour</string>
 
 <string name="watermark_timezone_title">Timezone</string>
 

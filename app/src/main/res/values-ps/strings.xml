@@ -517,13 +517,13 @@ Tawsiya shwee: 192000 bps, 48000 Hz da aksar karwonko lapara.</string>
     <string name="app_icon_calculator" translatable="false">Calculator</string>
     <string name="app_icon_car" translatable="false">ClutchX</string>
     <string name="app_icon_clock" translatable="false">Clock</string>
-    <string name="app_icon_default" translatable="false">Legacy</string>
+    <string name="app_icon_default" translatable="false">FadCam</string>
     <string name="app_icon_faded" translatable="false">0xFF0000</string>
     <string name="app_icon_fadseclab" translatable="false">FadSec Lab</string>
     <string name="app_icon_football" translatable="false">FootballX 2024</string>
     <string name="app_icon_jet" translatable="false">JF-17: ThunderX</string>
-    <string name="app_icon_minimal" translatable="false">Minimal</string>
-    <string name="app_icon_noor" translatable="false">Noor</string>
+    <string name="app_icon_minimal" translatable="false">FadCam</string>
+    <string name="app_icon_nooristic" translatable="false">FadCam ++</string>
     <string name="app_icon_notes" translatable="false">Notes</string>
     <string name="app_icon_pakistan" translatable="false">FadCam</string>
     <string name="app_icon_palestine" translatable="false">I❤️Palestine</string>
@@ -948,7 +948,22 @@ Export runs as a background service — you can close the app and it will keep e
     <string name="faditor_volume_warning">Above 100%% may degrade audio quality</string>
     <string name="faditor_your_recordings">Your Recordings</string>
     <string name="fadrec_audio_source_choose">Da ghag manba intikhab ka</string>
+
+	<string name="fadrec_audio_source_helper">Wakhele che screen recording kom aawaz wokhli. \"Asli (da system routing)\" da USB aw wired microphones lapara warshnale — ya kom khas device entikhab kai explicit routing lapara.</string>
+	<string name="fadrec_audio_source_mic_default">Microphone (asli routing)</string>
     <string name="fadrec_audio_source_internal">Da Device Ghag (Dakhili)</string>
+
+	<string name="screen_rec_audio_device_title">Da Aawaz Dakhila Aalaat</string>
+	<string name="screen_rec_audio_device_default">Asli (da system routing)</string>
+	<string name="screen_rec_audio_device_helper">Wakhele che screen recording da kom Microphone na aawaz wokhli. \"Asli\" da system otomatic routing kare — da USB microphones lapara reliable option.</string>
+
+    <string name="records_repair_banner_dismiss">Bandid kol</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s na finalize shwe kala recording band shwe. Da otomatic toor da playable format ta awbadal shwe.</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s na de playable che da recording wosliga che app da pasmanzel ke wo. Da otomatic toor da playable format ta awbadal shwe.</string>
+
+    <string name="records_repair_banner_title">Recording tamir shwe</string>
     <string name="fadrec_audio_source_mic">Microphone</string>
     <string name="fadrec_audio_source_none">Ghag Nadi</string>
     <string name="fadrec_audio_source_title">Da Ghag Manba</string>
@@ -1827,16 +1842,20 @@ Yadona: La na yao exit method faal pati shi che bended na shi!</string>
     <string name="shortcut_purpose_start_dual">This shortcut starts dual camera recording (PiP).</string>
     <string name="shortcut_purpose_start_front">This shortcut starts recording with the front camera.</string>
     <string name="shortcut_purpose_stop">This shortcut stops the current recording.</string>
+    <string name="shortcut_purpose_toggle">Ya shortuct che rekording pila kawi ya wadar kawi de ḍḍṉ cameral sara — de manual control pa khpaṉya Pila aw Wadar shortucts wakaṛ.</string>
     <string name="shortcut_purpose_torch">This shortcut toggles the torch.</string>
     <string name="shortcut_start_back">Shuru Shata</string>
     <string name="shortcut_start_current">Shuru Current</string>
+    <string name="shortcut_toggle_recording">Pila / Wadar</string>
+    <string name="shortcut_toggle_recording_long">Rekording pila aw ya wadar kawal</string>
     <string name="shortcut_start_dual">Shuru Dual</string>
     <string name="shortcut_start_front">Shuru Makhki</string>
     <string name="shortcut_take_photo">Tasweer</string>
     <string name="shortcut_take_photo_front">Selfie</string>
     <string name="shortcut_take_screenshot">FadRec</string>
     <string name="shortcuts_add_to_home">Kor screen ta Zaat ka</string>
-    <string name="shortcuts_and_widgets">Shortcuts &amp; Widgets</string>
+    <string name="shortcuts_widgets_screen_title">Shortcuts &amp; Widgets</string>
+    <string name="shortcuts_and_widgets">Widgets</string>
     <string name="shortcuts_choose_from_app_icons">App icons na intikhab ka</string>
     <string name="shortcuts_choose_from_gallery">Gallery na intikhab ka</string>
     <string name="shortcuts_choose_icon_desc">Intikhab Ka an icon for da shortcut. You can choose from the app\'s icon set or select an image from sta / khpal gallery.</string>
@@ -2250,6 +2269,7 @@ Yadona: La na yao exit method faal pati shi che bended na shi!</string>
     <string name="watermark_timezone_format_title">Gaz Bande Format</string>
     <string name="watermark_timezone_off">Band</string>
     <string name="watermark_timezone_on_gmt">On — GMT offset in watermark</string>
+    <string name="watermark_day_title">Wradzha</string>
     <string name="watermark_timezone_title">Gaz Bande</string>
     <string name="watermark_utm_helper">UTM Earth 60 zones ke wehai aw lat/lon easting &amp; northing meters ke badlai. Military, surveyors, aw topographic maps pa mreshta precise grid positioning dapara istemal kegi.
 
@@ -2263,6 +2283,7 @@ How to read: "Zone 42N — 372,684m E, 3,512,334m N" = Zone 42 pa Northern hemis
     <string name="waveform_helper_text">Control kai che audio waveform visualization pa progress bar ke video playback wakht ke zaher shi ke na.</string>
     <string name="waveform_switch_label">Audio Waveform Faal Ka</string>
     <string name="website_title">Website</string>
+    <string name="whats_new_no_browser">Da link paųčhelawalo kompyutar nay mung</string>
     <string name="whats_new_subtitle">See latest features and updates</string>
     <string name="whats_new_title">What\'s New</string>
     <string name="widget_arabic_date_format_title">Arabic Tarikh Format</string>

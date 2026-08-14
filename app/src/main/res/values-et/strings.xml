@@ -136,9 +136,24 @@
     <!-- FadRec audio source picker -->
     <string name="fadrec_audio_source_title">Heliallikas</string>
     <string name="fadrec_audio_source_choose">Vali heliallikas</string>
+
+	<string name="fadrec_audio_source_helper">Vali, millist heli ekraanisalvestused jäädvustavad. \"Vaikimisi (süsteemi marsruutimine)\" on soovitatav USB- ja juhtmega mikrofonide puhul — või vali konkreetne seade selgesõnaliseks marsruutimiseks.</string>
+	<string name="fadrec_audio_source_mic_default">Mikrofon (vaikimisi marsruutimine)</string>
     <string name="fadrec_audio_source_none">Helita</string>
     <string name="fadrec_audio_source_mic">Mikrofon</string>
     <string name="fadrec_audio_source_internal">Seadme heli (sisemine)</string>
+
+	<string name="screen_rec_audio_device_title">Helisisendseade</string>
+	<string name="screen_rec_audio_device_default">Vaikimisi (süsteemi marsruutimine)</string>
+	<string name="screen_rec_audio_device_helper">Vali mikrofon, millega ekraanisalvestused heli salvestavad. \"Vaikimisi\" kasutab süsteemi automaatset marsruutimist — usaldusväärne valik USB-mikrofonide puhul.</string>
+
+    <string name="records_repair_banner_dismiss">Sulge</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s ei lõpetatud salvestuse peatamisel. See teisendati automaatselt taasesitatavasse vormingusse.</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s ei olnud taasesitatav, kuna salvestus katkes, kui rakendus oli taustal. See teisendati automaatselt taasesitatavasse vormingusse.</string>
+
+    <string name="records_repair_banner_title">Salvestis parandatud</string>
 
     <string name="video_recording_started">Salvestamine alustatud</string>
     <string name="video_recording_stopped">Salvestamine peatatud</string>
@@ -249,6 +264,7 @@
     <string name="tips_title">Näpunäited</string>
     <string name="tips_subtitle">Kasulikud kasutusnõuanded</string>
     <string name="whats_new_title">Mis on uut</string>
+    <string name="whats_new_no_browser">Selle lingi avamiseks ei leitud ühtegi rakendust</string>
     <string name="whats_new_subtitle">Vaata viimaseid funktsioone ja uuendusi</string>
     <string name="home_menu">Avalehe menüü</string>
     <string name="home_sidebar_title">Avaleht</string>
@@ -842,7 +858,8 @@
     <string name="shortcuts_helper_text">Lisa otseteed ülalt. Need töötavad ka automatiseerimise rakendustega (nt MacroDroid), et määrata helitugevusnuppe.</string>
     <string name="shortcuts_add_to_home">Lisa avalehele</string>
     <string name="shortcuts_sheet_helper">Sinu käivitaja küsib paigutust.</string>
-    <string name="shortcuts_and_widgets">Otseteed ja vidinad</string>
+    <string name="shortcuts_widgets_screen_title">Otseteed ja vidinad</string>
+    <string name="shortcuts_and_widgets">Vidinad</string>
     <string name="video_player_settings_title">Videoesitaja seaded</string>
     <string name="video_player_settings_helper">Esituskiirus muudab video esitamise normaalset kiirust. Kiirkiirus on ajutine tõuge, mida rakendatakse ainult siis, kui vajutad videol pikalt. Saad muuta neid seadeid siin või otse videoesitaja ekraanilt.</string>
     <string name="video_player_settings_subtitle">Esitus ja kiirkiirus</string>
@@ -936,6 +953,7 @@
     <string name="shortcut_purpose_start_current">See otsetee alustab hetkel valitud kaamerarežiimiga salvestamist.</string>
     <string name="shortcut_purpose_start_dual">See otsetee alustab duaalkaamera salvestamist (PiP).</string>
     <string name="shortcut_purpose_stop">See otsetee peatab praeguse salvestamise.</string>
+    <string name="shortcut_purpose_toggle">Üks dünaamiline otsetee, mis alustab või peatab salvestuse vaikekaameraga — käsitsi juhtimiseks kasuta eraldi Salvesta ja Peata otseteid.</string>
     <string name="shortcut_purpose_torch">See otsetee lülitab taskulampi.</string>
     <string name="shortcut_purpose_photo">See otsetee jäädvustab tagakaamera foto ja salvestab selle FadCam/FadShot asukohta.</string>
     <string name="shortcut_purpose_photo_front">See otsetee jäädvustab esikaamera foto ja salvestab selle FadCam/FadShot asukohta.</string>
@@ -959,6 +977,8 @@
     <string name="shortcut_start_back">Alusta taga</string>
     <string name="shortcut_start_front">Alusta ees</string>
     <string name="shortcut_start_current">Alusta praegune</string>
+    <string name="shortcut_toggle_recording">Salvesta / Peata</string>
+    <string name="shortcut_toggle_recording_long">Salvestamise alustamine või lõpetamine</string>
     <string name="shortcut_start_dual">Alusta duaalselt</string>
     <string name="stop_recording">Peata</string>
     <string name="shortcut_take_photo">Foto</string>
@@ -1412,13 +1432,13 @@ Soovitatav: 192000 bps, 48000 Hz enamikele kasutajatele.</string>
     <string name="header_logo_avatar" translatable="false">Avatar</string>
     <string name="setting_app_icon_desc">Muuda rakenduse käivitaja ikooni ja nime</string>
     <string name="app_icon_dialog_title">Vali rakenduse ikoon</string>
-    <string name="app_icon_default" translatable="false">Legacy</string>
+    <string name="app_icon_default" translatable="false">FadCam</string>
     <string name="app_icon_alternative" translatable="false">Camera</string>
     <string name="app_icon_faded" translatable="false">0xFF0000</string>
     <string name="app_icon_palestine" translatable="false">I❤️Palestine</string>
     <string name="app_icon_pakistan" translatable="false">FadCam</string>
     <string name="app_icon_fadseclab" translatable="false">FadSec Lab</string>
-    <string name="app_icon_noor" translatable="false">Noor</string>
+    <string name="app_icon_nooristic" translatable="false">FadCam ++</string>
     <string name="app_icon_bat" translatable="false">FadCam</string>
     <string name="app_icon_redbinary" translatable="false">$ ~/r00t</string>
     <string name="app_icon_notes" translatable="false">Notes</string>
@@ -1629,7 +1649,7 @@ Soovitatav: 192000 bps, 48000 Hz enamikele kasutajatele.</string>
     <string name="storage_icon_description">Mälu ikoon</string>
     <string name="location_icon_description">Asukoha ikoon</string>
     <string name="location_embedding_icon_description">Asukoha lisamise ikoon</string>
-    <string name="app_icon_minimal" translatable="false">Minimal</string>
+    <string name="app_icon_minimal" translatable="false">FadCam</string>
     <string name="onboarding_swipe_instruction">Pühkida paremale jätkamiseks</string>
     <string name="onboarding_select_language">Vali eelistatud rakenduse keel.</string>
     <string name="onboarding_camera">Kaamera</string>
@@ -2146,6 +2166,7 @@ Sujuvama esitamise kogemuse jaoks saad kasutada välist esitajat nagu VLC. Siisk
     <string name="watermark_gps_disabled_warning">⚠ GPS on väljas — luba seadme asukoht, et see funktsioon töötaks</string>
     <string name="watermark_gps_disabled_home_toast">Asukohast sõltuvad vesimärgi funktsioonid lubatud, kuid GPS on väljas. Luba seadme asukoht, et need töötaksid.</string>
     <string name="watermark_gps_disabled_banner_message">Asukohast sõltuvad vesimärgi funktsioonid ei ilmu, kuni seadme asukoht on lubatud</string>
+    <string name="watermark_day_title">Päev</string>
     <string name="watermark_timezone_title">Ajavöönd</string>
     <string name="watermark_timezone_off">Väljas</string>
     <string name="watermark_timezone_on_gmt">Sees — GMT nihe vesimärgis</string>

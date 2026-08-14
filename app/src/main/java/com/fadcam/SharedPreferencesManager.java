@@ -1118,6 +1118,23 @@ public class SharedPreferencesManager {
             .apply();
     }
 
+    // ----- Lab (Forensics Gallery) grid span preference -----
+    private static final String PREF_KEY_LAB_GRID_SPAN =
+        "pref_lab_grid_span";
+
+    /** Returns the persisted Lab gallery grid span (columns), clamped to 1-5. Default: 2. */
+    public int getLabGridSpan() {
+        int span = sharedPreferences.getInt(PREF_KEY_LAB_GRID_SPAN, 2);
+        if (span < 1 || span > 5) span = 2;
+        return span;
+    }
+
+    /** Sets the persisted Lab gallery grid span (columns). */
+    public void setLabGridSpan(int span) {
+        if (span < 1 || span > 5) span = 2;
+        sharedPreferences.edit().putInt(PREF_KEY_LAB_GRID_SPAN, span).apply();
+    }
+
     public boolean isLocalisationEnabled() {
         return sharedPreferences.getBoolean(
             Constants.PREF_LOCATION_DATA,
@@ -1265,6 +1282,34 @@ public class SharedPreferencesManager {
 
     public boolean isTimezoneEnabled() {
         return sharedPreferences.getBoolean(Constants.PREF_WATERMARK_TIMEZONE, false);
+    }
+
+    public String getRecordsSortOption() {
+        return sharedPreferences.getString(Constants.PREF_RECORDS_SORT, "LATEST_FIRST");
+    }
+
+    public void setRecordsSortOption(String option) {
+        sharedPreferences.edit().putString(Constants.PREF_RECORDS_SORT, option).apply();
+    }
+
+    /** Returns the persisted Records grid span (columns), clamped to 1-5. Default: 2. */
+    public int getRecordsGridSpan() {
+        int span = sharedPreferences.getInt(Constants.PREF_RECORDS_GRID_SPAN, 2);
+        if (span < 1 || span > 5) span = 2;
+        return span;
+    }
+
+    public void setRecordsGridSpan(int span) {
+        if (span < 1 || span > 5) span = 2;
+        sharedPreferences.edit().putInt(Constants.PREF_RECORDS_GRID_SPAN, span).apply();
+    }
+
+    public boolean isWatermarkDayEnabled() {
+        return sharedPreferences.getBoolean(Constants.PREF_WATERMARK_DAY, true); // default ON
+    }
+
+    public void setWatermarkDayEnabled(boolean enabled) {
+        sharedPreferences.edit().putBoolean(Constants.PREF_WATERMARK_DAY, enabled).apply();
     }
 
     public void setTimezoneEnabled(boolean enabled) {
@@ -2042,10 +2087,17 @@ public class SharedPreferencesManager {
      * @return Current app icon key (e.g., "default", "pakistan", "minimal", etc.)
      */
     public String getCurrentAppIcon() {
-        return sharedPreferences.getString(
+        String key = sharedPreferences.getString(
             Constants.PREF_APP_ICON,
             Constants.APP_ICON_DEFAULT
         );
+        // Migration: a legacy icon key was renamed. Map old stored values so
+        // saved choices survive.
+        if ("noor".equals(key)) {
+            key = Constants.APP_ICON_NOORISTIC;
+            sharedPreferences.edit().putString(Constants.PREF_APP_ICON, key).apply();
+        }
+        return key;
     }
 
 
@@ -2085,8 +2137,8 @@ public class SharedPreferencesManager {
             Constants.APP_ICON_FADSECLAB.equals(iconKey)
         ) return com.fadcam.R.mipmap.ic_launcher_fadseclab;
         if (
-            Constants.APP_ICON_NOOR.equals(iconKey)
-        ) return com.fadcam.R.mipmap.ic_launcher_noor;
+            Constants.APP_ICON_NOORISTIC.equals(iconKey)
+        ) return com.fadcam.R.mipmap.ic_launcher_nooristic;
         if (
             Constants.APP_ICON_BAT.equals(iconKey)
         ) return com.fadcam.R.mipmap.ic_launcher_bat;
@@ -2128,60 +2180,26 @@ public class SharedPreferencesManager {
         String key = getCurrentAppIcon();
         try {
             if (Constants.APP_ICON_BLACK.equals(key)) return ""; // No name as requested
-            if (
-                Constants.APP_ICON_MINIMAL.equals(key)
-            ) return context.getString(R.string.app_icon_minimal);
-            if (
-                Constants.APP_ICON_ALTERNATIVE.equals(key)
-            ) return context.getString(R.string.app_icon_alternative);
-            if (Constants.APP_ICON_FADED.equals(key)) return context.getString(
-                R.string.app_icon_faded
-            );
-            if (
-                Constants.APP_ICON_PALESTINE.equals(key)
-            ) return context.getString(R.string.app_icon_palestine);
-            if (
-                Constants.APP_ICON_PAKISTAN.equals(key)
-            ) return context.getString(R.string.app_icon_pakistan);
-            if (
-                Constants.APP_ICON_FADSECLAB.equals(key)
-            ) return context.getString(R.string.app_icon_fadseclab);
-            if (Constants.APP_ICON_NOOR.equals(key)) return context.getString(
-                R.string.app_icon_noor
-            );
-            if (Constants.APP_ICON_BAT.equals(key)) return context.getString(
-                R.string.app_icon_bat
-            );
-            if (
-                Constants.APP_ICON_REDBINARY.equals(key)
-            ) return context.getString(R.string.app_icon_redbinary);
-            if (Constants.APP_ICON_NOTES.equals(key)) return context.getString(
-                R.string.app_icon_notes
-            );
-            if (
-                Constants.APP_ICON_CALCULATOR.equals(key)
-            ) return context.getString(R.string.app_icon_calculator);
-            if (Constants.APP_ICON_CLOCK.equals(key)) return context.getString(
-                R.string.app_icon_clock
-            );
-            if (
-                Constants.APP_ICON_WEATHER.equals(key)
-            ) return context.getString(R.string.app_icon_weather);
-            if (
-                Constants.APP_ICON_FOOTBALL.equals(key)
-            ) return context.getString(R.string.app_icon_football);
-            if (Constants.APP_ICON_CAR.equals(key)) return context.getString(
-                R.string.app_icon_car
-            );
-            if (Constants.APP_ICON_JET.equals(key)) return context.getString(
-                R.string.app_icon_jet
-            );
-        } catch (Exception ignored) {}
-        // Default app label
-        try {
-            return context.getString(R.string.app_name);
+            if (Constants.APP_ICON_DEFAULT.equals(key)) return context.getString(R.string.app_icon_default);
+            if (Constants.APP_ICON_MINIMAL.equals(key)) return context.getString(R.string.app_icon_minimal);
+            if (Constants.APP_ICON_ALTERNATIVE.equals(key)) return context.getString(R.string.app_icon_alternative);
+            if (Constants.APP_ICON_FADED.equals(key)) return context.getString(R.string.app_icon_faded);
+            if (Constants.APP_ICON_PALESTINE.equals(key)) return context.getString(R.string.app_icon_palestine);
+            if (Constants.APP_ICON_PAKISTAN.equals(key)) return context.getString(R.string.app_icon_pakistan);
+            if (Constants.APP_ICON_FADSECLAB.equals(key)) return context.getString(R.string.app_icon_fadseclab);
+            if (Constants.APP_ICON_NOORISTIC.equals(key)) return context.getString(R.string.app_icon_nooristic);
+            if (Constants.APP_ICON_BAT.equals(key)) return context.getString(R.string.app_icon_bat);
+            if (Constants.APP_ICON_REDBINARY.equals(key)) return context.getString(R.string.app_icon_redbinary);
+            if (Constants.APP_ICON_NOTES.equals(key)) return context.getString(R.string.app_icon_notes);
+            if (Constants.APP_ICON_CALCULATOR.equals(key)) return context.getString(R.string.app_icon_calculator);
+            if (Constants.APP_ICON_CLOCK.equals(key)) return context.getString(R.string.app_icon_clock);
+            if (Constants.APP_ICON_WEATHER.equals(key)) return context.getString(R.string.app_icon_weather);
+            if (Constants.APP_ICON_FOOTBALL.equals(key)) return context.getString(R.string.app_icon_football);
+            if (Constants.APP_ICON_CAR.equals(key)) return context.getString(R.string.app_icon_car);
+            if (Constants.APP_ICON_JET.equals(key)) return context.getString(R.string.app_icon_jet);
+            return key;
         } catch (Exception e) {
-            return "";
+            return key;
         }
     }
     
@@ -2217,6 +2235,145 @@ public class SharedPreferencesManager {
             .edit()
             .putString(Constants.PREF_SCREEN_RECORDING_AUDIO_SOURCE, audioSource)
             .apply();
+    }
+
+    // ----- Screen recording (cast) audio input device — INDEPENDENT from video mode.
+    // Video mode has its own audio input source/device prefs; cast must not inherit
+    // them (that inheritance is what regressed USB-mic capture — issue #334).
+    // Default = PHONE ("default routing", no forced device) = the reliable pre-split
+    // behavior. -----
+    private static final String PREF_KEY_SCREEN_AUDIO_INPUT_SOURCE =
+        "screen_recording_audio_input_source";
+    private static final String PREF_KEY_SCREEN_AUDIO_DEVICE_TYPE =
+        "screen_recording_audio_device_type";
+    private static final String PREF_KEY_SCREEN_AUDIO_DEVICE_NAME =
+        "screen_recording_audio_device_name";
+
+    /** Cast audio input source: PHONE (system routing) or WIRED (explicit device). */
+    public String getScreenRecordingAudioInputSource() {
+        return sharedPreferences.getString(
+            PREF_KEY_SCREEN_AUDIO_INPUT_SOURCE, AUDIO_INPUT_SOURCE_PHONE);
+    }
+
+    public void setScreenRecordingAudioInputSource(String source) {
+        sharedPreferences.edit().putString(PREF_KEY_SCREEN_AUDIO_INPUT_SOURCE, source).apply();
+    }
+
+    /** Cast audio input device type (AudioDeviceInfo.TYPE_*), -1 = any. */
+    public int getScreenRecordingAudioDeviceType() {
+        return sharedPreferences.getInt(PREF_KEY_SCREEN_AUDIO_DEVICE_TYPE, -1);
+    }
+
+    public void setScreenRecordingAudioDeviceType(int type) {
+        sharedPreferences.edit().putInt(PREF_KEY_SCREEN_AUDIO_DEVICE_TYPE, type).apply();
+    }
+
+    /** Cast audio input device product name (matched by name first), null = any. */
+    public String getScreenRecordingAudioDeviceName() {
+        return sharedPreferences.getString(PREF_KEY_SCREEN_AUDIO_DEVICE_NAME, null);
+    }
+
+    public void setScreenRecordingAudioDeviceName(String name) {
+        sharedPreferences.edit().putString(PREF_KEY_SCREEN_AUDIO_DEVICE_NAME, name).apply();
+    }
+
+    // ----- Self-healing repair events (issue #332) -----
+    // Persisted JSON array so the user can be told (Records banner) that an
+    // interrupted recording was automatically repaired. Only ever written when
+    // the file conversion ACTUALLY succeeded — no false positives.
+
+    private static final String PREF_KEY_REPAIR_EVENTS = "recording_repair_events_v1";
+    private static final int MAX_REPAIR_EVENTS = 5;
+
+    /** Adds a repair event; returns the new event id (timeMs) for dismissal. */
+    public long addRecordingRepairEvent(String fileName, long timeMs, String reason) {
+        try {
+            org.json.JSONArray arr = getRepairEventsArray();
+            org.json.JSONObject ev = new org.json.JSONObject();
+            ev.put("file", fileName);
+            ev.put("time", timeMs);
+            ev.put("reason", reason);
+            arr.put(ev);
+            while (arr.length() > MAX_REPAIR_EVENTS) {
+                arr.remove(0);
+            }
+            sharedPreferences.edit().putString(PREF_KEY_REPAIR_EVENTS, arr.toString()).apply();
+            return timeMs;
+        } catch (Exception e) {
+            return timeMs;
+        }
+    }
+
+    /** Removes a repair event by its timeMs id (banner dismissed). */
+    public void removeRecordingRepairEvent(long timeMs) {
+        try {
+            org.json.JSONArray arr = getRepairEventsArray();
+            org.json.JSONArray out = new org.json.JSONArray();
+            for (int i = 0; i < arr.length(); i++) {
+                org.json.JSONObject ev = arr.optJSONObject(i);
+                if (ev == null || ev.optLong("time", -1) != timeMs) {
+                    out.put(ev);
+                }
+            }
+            sharedPreferences.edit().putString(PREF_KEY_REPAIR_EVENTS, out.toString()).apply();
+        } catch (Exception ignored) {}
+    }
+
+    /** Returns pending repair events as {timeMs, reason, fileName}, newest first. */
+    public java.util.List<String[]> getRecordingRepairEvents() {
+        java.util.List<String[]> events = new java.util.ArrayList<>();
+        try {
+            org.json.JSONArray arr = getRepairEventsArray();
+            for (int i = arr.length() - 1; i >= 0; i--) {
+                org.json.JSONObject ev = arr.optJSONObject(i);
+                if (ev == null) continue;
+                long time = ev.optLong("time", -1);
+                String file = ev.optString("file", "");
+                String reason = ev.optString("reason", "background_interrupted");
+                if (time >= 0 && !file.isEmpty()) {
+                    events.add(new String[]{String.valueOf(time), reason, file});
+                }
+            }
+        } catch (Exception ignored) {}
+        return events;
+    }
+
+    private org.json.JSONArray getRepairEventsArray() {
+        try {
+            String raw = sharedPreferences.getString(PREF_KEY_REPAIR_EVENTS, null);
+            if (raw == null || raw.isEmpty()) return new org.json.JSONArray();
+            return new org.json.JSONArray(raw);
+        } catch (Exception e) {
+            return new org.json.JSONArray();
+        }
+    }
+
+    // ----- Self-healing scan watermark (issue #332) -----
+    // Files modified BEFORE this timestamp were already checked; the scan only
+    // touches newer ones, so repeated scans stay O(new files) — never a full
+    // directory walk of old recordings.
+
+    private static final String PREF_KEY_REPAIR_LAST_SCAN = "recording_repair_last_scan_v1";
+
+    public long getLastRepairScanTime() {
+        return sharedPreferences.getLong(PREF_KEY_REPAIR_LAST_SCAN, 0L);
+    }
+
+    public void setLastRepairScanTime(long timeMs) {
+        sharedPreferences.edit().putLong(PREF_KEY_REPAIR_LAST_SCAN, timeMs).apply();
+    }
+
+    // One-time flag: retry files wrongly marked "unrepairable" by earlier buggy
+    // builds (write-only channel crash, then the avcC sample-entry offset bug).
+    // Guarded so genuinely broken files are never re-looped by the observer.
+    private static final String PREF_KEY_REPAIR_V2_RESET = "recording_repair_v3_reset_done";
+
+    public boolean isRepairV2ResetDone() {
+        return sharedPreferences.getBoolean(PREF_KEY_REPAIR_V2_RESET, false);
+    }
+
+    public void setRepairV2ResetDone(boolean done) {
+        sharedPreferences.edit().putBoolean(PREF_KEY_REPAIR_V2_RESET, done).apply();
     }
 
     /**

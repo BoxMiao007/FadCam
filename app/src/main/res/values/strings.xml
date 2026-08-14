@@ -135,9 +135,23 @@
     <!-- FadRec audio source picker -->
     <string name="fadrec_audio_source_title">Audio Source</string>
     <string name="fadrec_audio_source_choose">Choose audio source</string>
+
+	<string name="fadrec_audio_source_helper">Choose what audio screen recordings capture. \"Default (system routing)\" is recommended for USB and wired microphones — or pick a specific device for explicit routing.</string>
+	<string name="fadrec_audio_source_mic_default">Microphone (Default routing)</string>
     <string name="fadrec_audio_source_none">No Audio</string>
     <string name="fadrec_audio_source_mic">Microphone</string>
     <string name="fadrec_audio_source_internal">Device Audio (Internal)</string>
+    <string name="screen_rec_audio_device_title">Audio Input Device</string>
+    <string name="screen_rec_audio_device_default">Default (system routing)</string>
+    <string name="screen_rec_audio_device_helper">Choose which microphone screen recordings record from. "Default" uses the system\u2019s automatic routing — the reliable option when using USB microphones.</string>
+
+    <string name="records_repair_banner_dismiss">Dismiss</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s was not finalized when the recording stopped. It has been converted to a playable format automatically.</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s was left unplayable because the recording was interrupted while the app was in the background. It has been converted to a playable format automatically.</string>
+
+    <string name="records_repair_banner_title">Recording repaired</string>
 
     <string name="video_recording_started">Recording started</string>
     <string name="video_recording_stopped">Recording stopped</string>
@@ -248,6 +262,7 @@
     <string name="tips_title">Tips</string>
     <string name="tips_subtitle">Helpful usage tips</string>
     <string name="whats_new_title">What\'s New</string>
+    <string name="whats_new_no_browser">No app found to open this link</string>
     <string name="whats_new_subtitle">See latest features and updates</string>
     <string name="home_menu">Home Menu</string>
     <string name="home_sidebar_title">Home</string>
@@ -802,7 +817,7 @@
     <string name="watermark_custom_text_hint">Enter custom text</string>
     <string name="watermark_custom_text_empty">Not set</string>
     <string name="helper_watermark_custom_text">Add a custom line of text that will appear below the timestamp and location (if enabled) in your watermark.\n\nExamples: ABC-1234 (dashcam), Camera #3, Conference Hall A</string>
-    <string name="helper_app_icon_option" translatable="false">Select an alternative launcher icon.</string>
+    <string name="helper_app_icon_option" translatable="false">The title is the name of each app icon; the badge is its internal codename.\n\nThe black icon intentionally has no name \u2014 on a dark wallpaper it blends in and the icon becomes nearly invisible, which is useful for privacy.</string>
     <!-- End watermark unified strings -->
     <string name="torch_shortcut_short_label">Torch</string>
     <string name="torch_shortcut_long_label">Toggle Torch</string>
@@ -853,7 +868,8 @@
     <string name="shortcuts_macrodroid_template">Official MacroDroid template: https://templates.macrodroid.com/view/28194</string>
     <string name="shortcuts_add_to_home">Add to Home screen</string>
     <string name="shortcuts_sheet_helper">Your launcher will prompt for placement.</string>
-    <string name="shortcuts_and_widgets">Shortcuts &amp; Widgets</string>
+    <string name="shortcuts_widgets_screen_title">Shortcuts &amp; Widgets</string>
+    <string name="shortcuts_and_widgets">Widgets</string>
     <string name="video_player_settings_title">Video Player Settings</string>
     <string name="video_player_settings_helper">Playback Speed changes the normal speed of video playback. Quick Speed is a temporary boost applied only while you press and hold on the video. You can change these settings here or directly from the Video Player screen.</string>
     <string name="video_player_settings_subtitle">Playback &amp; Quick Speed</string>
@@ -955,6 +971,7 @@
     <string name="shortcut_purpose_start_current">This shortcut starts recording with the currently selected camera mode.</string>
     <string name="shortcut_purpose_start_dual">This shortcut starts dual camera recording (PiP).</string>
     <string name="shortcut_purpose_stop">This shortcut stops the current recording.</string>
+    <string name="shortcut_purpose_toggle">A single dynamic shortcut that starts or stops the recording using the default camera — use the separate Start and Stop shortcuts for manual control.</string>
     <string name="shortcut_purpose_torch">This shortcut toggles the torch.</string>
     <string name="shortcut_purpose_photo">This shortcut captures a back camera photo and saves it to FadCam/FadShot location.</string>
     <string name="shortcut_purpose_photo_front">This shortcut captures a front camera photo and saves it to FadCam/FadShot location.</string>
@@ -982,7 +999,7 @@
     <string name="shortcut_start_front">Start Front</string>
     <string name="shortcut_start_current">Start Current</string>
     <string name="shortcut_start_dual">Start Dual</string>
-    <string name="shortcut_toggle_recording">Toggle Recording</string>
+    <string name="shortcut_toggle_recording">Start / Stop</string>
     <string name="shortcut_toggle_recording_long">Start or stop recording</string>
     <string name="stop_recording">Stop</string>
     <string name="shortcut_take_photo">Photo</string>
@@ -1518,13 +1535,13 @@ Recommended: 192000 bps, 48000 Hz for most users.</string>
 
     <string name="setting_app_icon_desc">Change the app\'s launcher icon and name</string>
     <string name="app_icon_dialog_title">Choose App Icon</string>
-    <string name="app_icon_default" translatable="false">Legacy</string>
+    <string name="app_icon_default" translatable="false">FadCam</string>
     <string name="app_icon_alternative" translatable="false">Camera</string>
     <string name="app_icon_faded" translatable="false">0xFF0000</string>
     <string name="app_icon_palestine" translatable="false">I❤️Palestine</string>
     <string name="app_icon_pakistan" translatable="false">FadCam</string>
     <string name="app_icon_fadseclab" translatable="false">FadSec Lab</string>
-    <string name="app_icon_noor" translatable="false">Noor</string>
+    <string name="app_icon_nooristic" translatable="false">FadCam ++</string>
     <string name="app_icon_bat" translatable="false">FadCam</string>
     <string name="app_icon_redbinary" translatable="false">$ ~/r00t</string>
     <string name="app_icon_notes" translatable="false">Notes</string>
@@ -1748,7 +1765,7 @@ Recommended: 192000 bps, 48000 Hz for most users.</string>
     <string name="location_icon_description">Location Icon</string>
     <string name="location_embedding_icon_description">Location Embedding Icon</string>
 
-    <string name="app_icon_minimal" translatable="false">Minimal</string>
+    <string name="app_icon_minimal" translatable="false">FadCam</string>
 
     <!-- Onboarding Strings -->
     <string name="onboarding_swipe_instruction">Swipe right to continue</string>
@@ -2380,6 +2397,7 @@ For the smoothest playback experience, you can use an external player like VLC. 
     <string name="watermark_gps_disabled_warning">⚠ GPS is off — enable device location for this feature to work</string>
     <string name="watermark_gps_disabled_home_toast">Location-dependent watermark features enabled but GPS is off. Enable device location for them to work.</string>
     <string name="watermark_gps_disabled_banner_message">Location-dependent watermark features will not appear until device location is enabled</string>
+    <string name="watermark_day_title">Day</string>
     <string name="watermark_timezone_title">Timezone</string>
     <string name="watermark_timezone_off">Off</string>
     <string name="watermark_timezone_on_gmt">On — GMT offset in watermark</string>

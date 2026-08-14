@@ -628,7 +628,8 @@
     <string name="shortcuts_helper_text">添加上方的快捷方式。它们也可与自动化应用（如 MacroDroid）协同工作，用于触发诸如映射音量键之类的操作。</string>
     <string name="shortcuts_add_to_home">添加到主屏幕</string>
     <string name="shortcuts_sheet_helper">您的启动器将提示您选择放置位置。</string>
-    <string name="shortcuts_and_widgets">快捷方式与小组件</string>
+    <string name="shortcuts_widgets_screen_title">快捷方式与小组件</string>
+    <string name="shortcuts_and_widgets">小组件</string>
     <string name="video_player_settings_title">视频播放器设置</string>
     <string name="video_player_settings_helper">播放速度用于改变视频的正常播放速率。快速播放则是一个临时加速功能，仅在您长按视频时生效。您可以在此处或直接从视频播放器界面更改这些设置。</string>
     <string name="video_player_settings_subtitle">播放与快速播放</string>
@@ -711,6 +712,7 @@
     <string name="shortcuts_rename_helper">提示：留空则使用默认名称。</string>
     <string name="shortcuts_rename_action_title">重命名</string>
     <string name="shortcuts_rename_action_subtitle">点击重命名</string>
+    <string name="shortcut_purpose_toggle">一个单一的动态快捷方式，使用默认相机开始或停止录制 — 手动控制请使用单独的“开始”和“停止”快捷方式。</string>
     <string name="shortcut_purpose_torch">此快捷方式可切换手电筒。</string>
     <string name="widget_customize_action_label">自定义</string>
     <string name="widget_customize_action_subtitle">时间、日期与主题选项</string>
@@ -988,6 +990,7 @@
     <string name="fadrec_permission_denied">屏幕录制权限被拒绝</string>
     <string name="fadrec_mode_title">FadRec • 屏幕录制</string>
     <string name="whats_new_title">新功能</string>
+    <string name="whats_new_no_browser">未找到可以打开此链接的应用</string>
     <string name="whats_new_subtitle">查看最新功能和更新</string>
     <string name="rename_layer_title">重命名图层</string>
     <string name="rename_layer_message">为图层输入新名称</string>
@@ -1995,9 +1998,24 @@ FadCam 为录制使用分段式 MP4 格式。这意味着视频被保存为多�
 <string name="faditor_your_recordings">您的录制文件</string>
 
 <!-- fadrec_audio_source_choose -->
+
+	<string name="fadrec_audio_source_helper">选择屏幕录制捕获的音频。“默认（系统路由）”推荐用于 USB 和有线麦克风——或选择特定设备进行显式路由。</string>
+	<string name="fadrec_audio_source_mic_default">麦克风（默认路由）</string>
 <string name="fadrec_audio_source_choose">选择音频源</string>
 
 <!-- fadrec_audio_source_internal -->
+
+	<string name="screen_rec_audio_device_title">音频输入设备</string>
+	<string name="screen_rec_audio_device_default">默认（系统路由）</string>
+	<string name="screen_rec_audio_device_helper">选择屏幕录制使用的麦克风。“默认”使用系统的自动路由——使用 USB 麦克风时的可靠选择。</string>
+
+    <string name="records_repair_banner_dismiss">关闭</string>
+
+    <string name="records_repair_banner_message_finalize">%1$s 在录制停止时未完成收尾，现已自动转换为可播放格式。</string>
+
+    <string name="records_repair_banner_message_interrupted">%1$s 因应用在后台时录制被中断而无法播放，现已自动转换为可播放格式。</string>
+
+    <string name="records_repair_banner_title">录制已修复</string>
 <string name="fadrec_audio_source_internal">设备音频（内部）</string>
 
 <!-- fadrec_audio_source_mic -->
@@ -3769,6 +3787,8 @@ FadCam 为录制使用分段式 MP4 格式。这意味着视频被保存为多�
 <string name="shortcut_start_current">当前开始</string>
 
 <!-- shortcut_start_dual -->
+<string name="shortcut_toggle_recording">开始 / 停止</string>
+<string name="shortcut_toggle_recording_long">开始或停止录制</string>
 <string name="shortcut_start_dual">双摄开始</string>
 
 <!-- shortcut_start_front -->
@@ -4264,6 +4284,7 @@ FadCam 为录制使用分段式 MP4 格式。这意味着视频被保存为多�
 <string name="watermark_timezone_on_gmt">开 — 水印中显示GMT偏移</string>
 
 <!-- watermark_timezone_title -->
+<string name="watermark_day_title">星期</string>
 <string name="watermark_timezone_title">时区</string>
 
 <!-- watermark_utm_helper -->
