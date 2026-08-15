@@ -438,11 +438,6 @@ public class FadRecHomeFragment extends HomeFragment {
      */
     @Override
     protected void updateStartButtonAvailability() {
-        FLog.e(TAG, "============================================");
-        FLog.e(TAG, "FadRecHomeFragment.updateStartButtonAvailability() CALLED");
-        FLog.e(TAG, "screenRecordingState: " + screenRecordingState);
-        FLog.e(TAG, "============================================");
-        
         if (!isAdded() || buttonStartStop == null) {
             FLog.e(TAG, "Button or fragment not available");
             return;
@@ -454,9 +449,6 @@ public class FadRecHomeFragment extends HomeFragment {
         buttonStartStop.setEnabled(true);
         buttonStartStop.setClickable(true);
         buttonStartStop.setAlpha(1.0f);
-        FLog.e(TAG, "!!! BUTTON FORCE ENABLED IN updateStartButtonAvailability !!!");
-        FLog.e(TAG, "Button enabled: " + buttonStartStop.isEnabled());
-        FLog.e(TAG, "Button alpha: " + buttonStartStop.getAlpha());
         
         // Also ensure camera controls stay hidden
         if (buttonCamSwitch != null) {
@@ -508,7 +500,10 @@ public class FadRecHomeFragment extends HomeFragment {
         updateCardForScreenRecording(rootView);
         configurePreviewCardForScreenRecording(rootView);
         
-        // Hide recording tiles (AF, exposure, zoom - camera specific)
+        // Hide recording tiles (AF, exposure, zoom - camera specific).
+        // NOTE: the floating-controls card (avatar toggle) is inserted INTO the
+        // AF tile's parent FrameLayout, so the container must stay visible —
+        // only the tile buttons and their value labels are hidden.
         View tileAfToggle = rootView.findViewById(com.fadcam.R.id.tile_af_toggle);
         if (tileAfToggle != null) {
             tileAfToggle.setVisibility(View.GONE);
@@ -521,6 +516,21 @@ public class FadRecHomeFragment extends HomeFragment {
         View tileZoom = rootView.findViewById(com.fadcam.R.id.tile_zoom);
         if (tileZoom != null) {
             tileZoom.setVisibility(View.GONE);
+        }
+        
+        // Hide the per-tile value labels too — they are separate TextViews that
+        // would otherwise linger as ghosts next to the floating-controls card.
+        View tileAfStatus = rootView.findViewById(com.fadcam.R.id.tile_af_status_icon);
+        if (tileAfStatus != null) {
+            tileAfStatus.setVisibility(View.GONE);
+        }
+        View tileExpLabel = rootView.findViewById(com.fadcam.R.id.tile_exp_label);
+        if (tileExpLabel != null) {
+            tileExpLabel.setVisibility(View.GONE);
+        }
+        View tileZoomLabel = rootView.findViewById(com.fadcam.R.id.tile_zoom_label);
+        if (tileZoomLabel != null) {
+            tileZoomLabel.setVisibility(View.GONE);
         }
         
         // Hide recording controls title (AF · Exposure · Zoom)
@@ -554,17 +564,22 @@ public class FadRecHomeFragment extends HomeFragment {
             null
         );
         
-        // Find the parent layout where tiles were (should be tile_af_toggle's parent)
-        View tileAfToggle = rootView.findViewById(com.fadcam.R.id.tile_af_toggle);
+        // Insert the card FULL-WIDTH where the tiles row sits (inside the
+        // recording-controls card's vertical container), then hide the tiles
+        // row. Inserting into tile_af_toggle's FrameLayout would squeeze the
+        // card to 1/3 width and push the avatar next to the title.
+        View tilesRow = rootView.findViewById(com.fadcam.R.id.includeRecordingTiles);
         android.view.ViewGroup tilesParent = null;
-        
-        if (tileAfToggle != null && tileAfToggle.getParent() instanceof android.view.ViewGroup) {
-            tilesParent = (android.view.ViewGroup) tileAfToggle.getParent();
+        int insertIndex = 0;
+        if (tilesRow != null && tilesRow.getParent() instanceof android.view.ViewGroup) {
+            tilesParent = (android.view.ViewGroup) tilesRow.getParent();
+            insertIndex = tilesParent.indexOfChild(tilesRow);
         }
         
         if (tilesParent != null) {
-            // Add the floating controls card at the beginning
-            tilesParent.addView(cardFloatingControls, 0);
+            // Replace the tiles row position with the floating controls card
+            tilesParent.addView(cardFloatingControls, insertIndex);
+            tilesRow.setVisibility(View.GONE);
             
             // Setup switch
             com.fadcam.ui.AvatarToggleView switchFloatingControls = 
@@ -898,16 +913,11 @@ public class FadRecHomeFragment extends HomeFragment {
      * No need to force-enable buttons - our override handles that.
      */
     private void setupButtonHandlers(View rootView) {
-        FLog.d(TAG, "========== setupButtonHandlers() CALLED ==========");
-        
         // Use inherited protected fields from parent HomeFragment instead of local variables
         // This ensures we override the parent's camera click listener with screen recording logic
         buttonStartStop = rootView.findViewById(com.fadcam.R.id.buttonStartStop);
         buttonPauseResume = rootView.findViewById(com.fadcam.R.id.buttonPauseResume);
         buttonFadRecMute = rootView.findViewById(com.fadcam.R.id.buttonFadRecMute);
-        
-        FLog.d(TAG, "buttonStartStop found: " + (buttonStartStop != null));
-        FLog.d(TAG, "buttonPauseResume found: " + (buttonPauseResume != null));
         
         // NOTE: Don't load persisted state here - it interferes with broadcast-based state
         // State will be loaded from broadcasts or set to NONE if no broadcasts arrive
@@ -944,13 +954,6 @@ public class FadRecHomeFragment extends HomeFragment {
                     stopScreenRecording();
                 }
             });
-            
-            FLog.e(TAG, "============================================");
-            FLog.e(TAG, "Click listener SET on Start/Stop button");
-            FLog.e(TAG, "Button now has onClickListener: " + buttonStartStop.hasOnClickListeners());
-            FLog.e(TAG, "Button enabled: " + buttonStartStop.isEnabled());
-            FLog.e(TAG, "Button clickable: " + buttonStartStop.isClickable());
-            FLog.e(TAG, "============================================");
         } else {
             FLog.e(TAG, "ERROR: buttonStartStop is NULL!");
         }
@@ -1000,8 +1003,6 @@ public class FadRecHomeFragment extends HomeFragment {
             updateMuteButtonUi();
         }
         
-        FLog.d(TAG, "========== SETUP BUTTON HANDLERS COMPLETE ==========");
-
         // Safety: HomeFragment can disable this button based on camera resources.
         // FadRec must keep it enabled at all times.
         try {
@@ -1035,7 +1036,7 @@ public class FadRecHomeFragment extends HomeFragment {
      */
     private void persistRecordingState(ScreenRecordingState state) {
         sharedPreferencesManager.setScreenRecordingState(state.name());
-        FLog.d(TAG, "Persisted state: " + state);
+        updateUIForRecordingState();
     }
 
     /**
@@ -2051,10 +2052,6 @@ public class FadRecHomeFragment extends HomeFragment {
 
                 updateStartStopButtonForFoldedState();
             });
-
-            FLog.d(TAG, "Screen recording UI updated [" + (isStreamOnly ? "STREAM_ONLY" : "STREAM_AND_SAVE")
-                + "] available=" + availableSpace + " elapsed=" + elapsedTimeText
-                + " remaining=" + remainingTimeText);
         } catch (Exception e) {
             FLog.e(TAG, "Error in updateStorageInfoForScreenRecording", e);
         }
@@ -2192,16 +2189,6 @@ public class FadRecHomeFragment extends HomeFragment {
             || screenRecordingState == ScreenRecordingState.PAUSED
             || isScreenPreviewOnlyActive);
         boolean shouldAnimate = consumeAnimateNextPreviewTransition();
-        FLog.d(
-            TAG,
-            "updateModeSpecificPreviewVisibility: showPreview=" + showPreview
-                + " shouldAnimate=" + shouldAnimate
-                + " closePending=" + pendingPreviewCloseSleepAnimation
-                + " openPendingSurface=" + pendingPreviewOpenUntilSurfaceReady
-                + " previewOnly=" + isScreenPreviewOnlyActive
-                + " state=" + screenRecordingState
-        );
-
         if (showPreview && previewOpenSequenceRunning) {
             return;
         }
@@ -2602,7 +2589,6 @@ public class FadRecHomeFragment extends HomeFragment {
         // CRITICAL FIX: Force update button availability to override parent's camera-based logic
         // Parent disables button based on camera resource availability, but we need it always enabled
         updateStartButtonAvailability();
-        FLog.e(TAG, "!!! updateStartButtonAvailability() called at end of onResume !!!");
 
         // Sync UI with persisted state after tab switches / fragment resume.
         updateUIForRecordingState();

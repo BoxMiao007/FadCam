@@ -377,8 +377,8 @@ public class VideoPlayerSettingsFragment extends Fragment {
                     if ("c_custom".equals(sel)) {
                         final String RK_NUM =
                             "rk_vps_controller_timeout_custom";
-                        com.fadcam.ui.picker.NumberInputBottomSheetFragment num =
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.newInstance(
+                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment num =
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.newInstance(
                                 getString(R.string.timer_custom_title),
                                 1,
                                 86400,
@@ -394,8 +394,20 @@ public class VideoPlayerSettingsFragment extends Fragment {
                             ? num.getArguments()
                             : new android.os.Bundle();
                         _b.putString(
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.ARG_DESCRIPTION,
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DESCRIPTION,
                             getString(R.string.controls_hide_delay_helper)
+                        );
+                        _b.putBoolean(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_SHOW_RESET,
+                            true
+                        );
+                        _b.putInt(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DEFAULT_VALUE,
+                            1
+                        );
+                        _b.putString(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_FOOTER,
+                            getString(R.string.controls_hide_delay_footer)
                         );
                         num.setArguments(_b);
                         getParentFragmentManager().setFragmentResultListener(
@@ -403,7 +415,7 @@ public class VideoPlayerSettingsFragment extends Fragment {
                                 this,
                                 (rkn, nb) -> {
                                     int val = nb.getInt(
-                                        com.fadcam.ui.picker.NumberInputBottomSheetFragment.RESULT_NUMBER,
+                                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.RESULT_NUMBER,
                                         0
                                     );
                                     if (val > 0) {
@@ -807,8 +819,8 @@ public class VideoPlayerSettingsFragment extends Fragment {
                         // Show numeric input sheet: min 1 second, max e.g. 86400 (24h)
                         final String RK_NUM =
                             "rk_vps_background_playback_timer_custom";
-                        com.fadcam.ui.picker.NumberInputBottomSheetFragment num =
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.newInstance(
+                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment num =
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.newInstance(
                                 getString(R.string.timer_custom_title),
                                 1,
                                 86400,
@@ -825,12 +837,24 @@ public class VideoPlayerSettingsFragment extends Fragment {
                             ? num.getArguments()
                             : new android.os.Bundle();
                         _b.putString(
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.ARG_DESCRIPTION,
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DESCRIPTION,
                             getString(R.string.timer_custom_description)
                         );
                         _b.putBoolean(
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.ARG_ENABLE_TIMER_CALC,
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_ENABLE_TIMER_CALC,
                             true
+                        );
+                        _b.putBoolean(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_SHOW_RESET,
+                            true
+                        );
+                        _b.putInt(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DEFAULT_VALUE,
+                            60
+                        );
+                        _b.putString(
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_FOOTER,
+                            getString(R.string.background_playback_timer_footer)
                         );
                         num.setArguments(_b);
                         getParentFragmentManager().setFragmentResultListener(
@@ -838,7 +862,7 @@ public class VideoPlayerSettingsFragment extends Fragment {
                                 this,
                                 (rkN, nb) -> {
                                     int minutes = nb.getInt(
-                                        com.fadcam.ui.picker.NumberInputBottomSheetFragment.RESULT_NUMBER,
+                                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.RESULT_NUMBER,
                                         0
                                     );
                                     if (minutes > 0) {
@@ -1305,8 +1329,8 @@ public class VideoPlayerSettingsFragment extends Fragment {
                     if (s == null) return;
                     if ("s_custom".equals(s)) {
                         final String RK_NUM = "rk_vps_seek_amount_custom";
-                        com.fadcam.ui.picker.NumberInputBottomSheetFragment num =
-                            com.fadcam.ui.picker.NumberInputBottomSheetFragment.newInstance(
+                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment num =
+                            com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.newInstance(
                                 getString(R.string.seek_amount_custom_title),
                                 1,
                                 300,
@@ -1324,8 +1348,26 @@ public class VideoPlayerSettingsFragment extends Fragment {
                             num
                                 .getArguments()
                                 .putString(
-                                    com.fadcam.ui.picker.NumberInputBottomSheetFragment.ARG_DESCRIPTION,
+                                    com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DESCRIPTION,
                                     getString(R.string.seek_amount_helper)
+                                );
+                            num
+                                .getArguments()
+                                .putBoolean(
+                                    com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_SHOW_RESET,
+                                    true
+                                );
+                            num
+                                .getArguments()
+                                .putInt(
+                                    com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_DEFAULT_VALUE,
+                                    10
+                                );
+                            num
+                                .getArguments()
+                                .putString(
+                                    com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.ARG_FOOTER,
+                                    getString(R.string.seek_amount_footer)
                                 );
                         }
                         getParentFragmentManager().setFragmentResultListener(
@@ -1333,7 +1375,7 @@ public class VideoPlayerSettingsFragment extends Fragment {
                                 this,
                                 (rkN, nb) -> {
                                     int val = nb.getInt(
-                                        com.fadcam.ui.picker.NumberInputBottomSheetFragment.RESULT_NUMBER,
+                                        com.fadcam.ui.picker.MaterialNumberPickerBottomSheetFragment.RESULT_NUMBER,
                                         0
                                     );
                                     if (val > 0) {

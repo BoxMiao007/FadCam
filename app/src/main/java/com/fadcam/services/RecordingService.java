@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
@@ -49,7 +50,9 @@ import android.content.pm.ServiceInfo;
 import com.fadcam.CameraType;
 import com.fadcam.Constants;
 import com.fadcam.MainActivity;
+import com.fadcam.MaximumRecordingDuration;
 import com.fadcam.R;
+import com.fadcam.RecordingDurationLimitController;
 import com.fadcam.RecordingState;
 import com.fadcam.SharedPreferencesManager; // Use your manager
 import com.fadcam.Utils;
@@ -173,6 +176,8 @@ public class RecordingService extends Service {
     private boolean isCameraOpen = false;
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private RecordingDurationLimitController durationLimitController;
+    private SharedPreferences.OnSharedPreferenceChangeListener durationPreferenceListener;
 
     // Cached notification large icon — decoded once and reused to avoid BitmapFactory on every build.
     private android.graphics.Bitmap cachedNotificationIconBitmap = null;
@@ -254,6 +259,7 @@ public class RecordingService extends Service {
         super.onCreate();
         // Initialize essential components first
         sharedPreferencesManager = SharedPreferencesManager.getInstance(getApplicationContext());
+        initializeDurationLimitController();
 
         // Only initialize LocationHelper if location is explicitly enabled
         if (sharedPreferencesManager != null && sharedPreferencesManager.isLocalisationEnabled()) {
@@ -320,6 +326,81 @@ public class RecordingService extends Service {
 
         // Broadcast initial camera resource availability
         broadcastCameraResourceAvailability(true);
+    }
+
+    private void initializeDurationLimitController() {
+        durationLimitController = new RecordingDurationLimitController(
+                new RecordingDurationLimitController.Scheduler() {
+                    @Override
+                    public long elapsedRealtime() {
+                        return SystemClock.elapsedRealtime();
+                    }
+
+                    @Override
+                    public void postDelayed(Runnable runnable, long delayMs) {
+                        mainHandler.postDelayed(runnable, delayMs);
+                    }
+
+                    @Override
+                    public void removeCallbacks(Runnable runnable) {
+                        mainHandler.removeCallbacks(runnable);
+                    }
+                },
+                sharedPreferencesManager::getMaximumRecordingDurationMs,
+                () -> {
+                    FLog.i(TAG, "Maximum recording duration reached; stopping current recording");
+                    stopRecording();
+                });
+
+        durationPreferenceListener = (preferences, key) -> {
+            boolean customValueKey =
+                    SharedPreferencesManager.PREF_MAX_RECORDING_DURATION_CUSTOM_MINUTES.equals(key)
+                            || SharedPreferencesManager.PREF_MAX_RECORDING_DURATION_CUSTOM_SECONDS.equals(key);
+            if (!SharedPreferencesManager.PREF_MAX_RECORDING_DURATION_OPTION.equals(key)
+                    && !customValueKey) {
+                return;
+            }
+            if (customValueKey
+                    && !MaximumRecordingDuration.OPTION_CUSTOM.equals(
+                    sharedPreferencesManager.getMaximumRecordingDurationOption())) {
+                return;
+            }
+            if (durationLimitController.onLimitChanged()) {
+                long limitMs = sharedPreferencesManager.getMaximumRecordingDurationMs();
+                if (limitMs == 0L) {
+                    FLog.i(TAG, "Maximum recording duration disabled for current session");
+                } else {
+                    FLog.i(TAG, "Maximum recording duration updated for current session: "
+                            + limitMs + " ms");
+                }
+            }
+        };
+        sharedPreferencesManager.sharedPreferences.registerOnSharedPreferenceChangeListener(
+                durationPreferenceListener);
+    }
+
+    private void startDurationLimitSession() {
+        if (durationLimitController == null) {
+            return;
+        }
+        long limitMs = durationLimitController.startSession();
+        if (limitMs == 0L) {
+            FLog.d(TAG, "Maximum recording duration is disabled for this session");
+        } else {
+            FLog.i(TAG, "Maximum recording duration scheduled for current session: "
+                    + limitMs + " ms");
+        }
+    }
+
+    private void releaseDurationLimitController() {
+        if (durationLimitController != null) {
+            durationLimitController.stopSession();
+        }
+        if (sharedPreferencesManager != null && durationPreferenceListener != null) {
+            sharedPreferencesManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(
+                    durationPreferenceListener);
+            durationPreferenceListener = null;
+        }
     }
 
     private void scheduleMotionDetectorWarmupIfNeeded() {
@@ -1134,9 +1215,37 @@ public class RecordingService extends Service {
     private static final java.util.concurrent.atomic.AtomicBoolean scanRerunRequested =
             new java.util.concurrent.atomic.AtomicBoolean(false);
 
+    /**
+     * URIs whose files are currently being finalized by an in-flight
+     * stopRecording. The self-healing scan must NEVER touch these: a file can
+     * be mid-finalize while isRecordingInProgress() is already false (the flag
+     * is cleared at the start of the stop sequence, finalization runs later on
+     * the stop thread). Scanning it then would double-finalize and falsely
+     * report a repair (banner) for a manually stopped recording.
+     */
+    private static final java.util.Set<String> IN_FLIGHT_FINALIZATIONS =
+            java.util.Collections.synchronizedSet(new java.util.HashSet<String>());
+
+    private static void addInFlightFinalization(String uriString) {
+        if (uriString == null || uriString.isEmpty()) return;
+        IN_FLIGHT_FINALIZATIONS.add(uriString);
+    }
+
+    private static void removeInFlightFinalization(String uriString) {
+        if (uriString == null || uriString.isEmpty()) return;
+        IN_FLIGHT_FINALIZATIONS.remove(uriString);
+    }
+
     /** Broadcast after a self-healing scan finishes (may have repaired a file). */
     public static final String ACTION_SELF_HEAL_REPAIRED =
             "com.fadcam.action.SELF_HEAL_REPAIRED";
+
+    /**
+     * Delay before a failed (unrepairable) file is retried. Transient failures —
+     * a finalizer bug fixed in a later build, a temporarily-locked file, a
+     * mid-write snapshot — must not permanently abandon a recoverable recording.
+     */
+    public static final long REPAIR_RETRY_DELAY_MS = 24L * 60 * 60 * 1000; // 24h
 
     private static void doSelfHealingScan(final android.content.Context app) {
                     final SharedPreferencesManager prefs = SharedPreferencesManager.getInstance(app);
@@ -1160,15 +1269,22 @@ public class RecordingService extends Service {
                     }
                     FLog.i(TAG, "Self-healing scan: " + pending.size() + " pending file(s)");
                     final long now = System.currentTimeMillis();
+                    final long retryAfter = now + REPAIR_RETRY_DELAY_MS;
                     for (String uriString : pending) {
                         try {
+                            // Never touch a file the service is still finalizing
+                            // (manual stop in progress) — scanning it would
+                            // double-finalize and raise a false repair banner.
+                            if (IN_FLIGHT_FINALIZATIONS.contains(uriString)) {
+                                continue;
+                            }
                             android.net.Uri uri = android.net.Uri.parse(uriString);
                             String scheme = uri.getScheme();
                             int result;
                             if ("file".equals(scheme)) {
                                 java.io.File f = new java.io.File(uri.getPath());
                                 if (!f.exists() || f.length() == 0) {
-                                    repo.markFinalized(uriString, 2);
+                                    repo.markUnrepairableWithRetry(uriString, retryAfter);
                                     continue;
                                 }
                                 java.nio.channels.FileChannel ch =
@@ -1183,7 +1299,7 @@ public class RecordingService extends Service {
                                 android.os.ParcelFileDescriptor pfd =
                                         app.getContentResolver().openFileDescriptor(uri, "rw");
                                 if (pfd == null) {
-                                    repo.markFinalized(uriString, 2);
+                                    repo.markUnrepairableWithRetry(uriString, retryAfter);
                                     continue;
                                 }
                                 try {
@@ -1202,7 +1318,7 @@ public class RecordingService extends Service {
                                     try { pfd.close(); } catch (Exception ignored) {}
                                 }
                             } else {
-                                repo.markFinalized(uriString, 2);
+                                repo.markUnrepairableWithRetry(uriString, retryAfter);
                                 continue;
                             }
                             if (result == 1) {
@@ -1213,12 +1329,14 @@ public class RecordingService extends Service {
                                 // Already hybrid/plain MP4 — confirmed fine.
                                 repo.markFinalized(uriString, 1);
                             } else {
-                                // Fragmented but unrepairable — mark so we never retry.
-                                repo.markFinalized(uriString, 2);
+                                // Fragmented but unrepairable NOW — schedule a retry so
+                                // transient failures (e.g. a fixed finalizer bug) are
+                                // not permanently abandoned.
+                                repo.markUnrepairableWithRetry(uriString, retryAfter);
                             }
                         } catch (Exception e) {
                             FLog.w(TAG, "Self-healing scan failed on " + uriString, e);
-                            try { repo.markFinalized(uriString, 2); } catch (Exception ignored) {}
+                            try { repo.markUnrepairableWithRetry(uriString, retryAfter); } catch (Exception ignored) {}
                         }
                     }
                     // A stale in-progress session that produced no file is dead.
@@ -1266,10 +1384,19 @@ public class RecordingService extends Service {
             if (uriString == null) return;
             int result = finalizeFileChannelFor(uriString);
             if (result >= 0) {
-                try {
-                    com.fadcam.data.VideoIndexRepository.getInstance(this)
-                            .markFinalized(uriString, 1);
-                } catch (Exception ignored) {}
+                // Room forbids DB access on the main thread — dispatch the
+                // markFinalized write to the background handler.
+                final String finalUri = uriString;
+                if (backgroundHandler != null) {
+                    backgroundHandler.post(() -> {
+                        try {
+                            com.fadcam.data.VideoIndexRepository.getInstance(
+                                    RecordingService.this).markFinalized(finalUri, 1);
+                        } catch (Exception e) {
+                            FLog.w(TAG, "Safety-net markFinalized failed", e);
+                        }
+                    });
+                }
             }
             if (result == 1) {
                 FLog.i(TAG, "Safety-net finalization converted "
@@ -1551,6 +1678,9 @@ public class RecordingService extends Service {
 
             // Only proceed if we're in NONE state
             if (recordingState == RecordingState.NONE) {
+                if (durationLimitController != null) {
+                    durationLimitController.stopSession();
+                }
                 // Update the UI and Service state atomically
                 recordingState = RecordingState.STARTING;
                 // Clear a stale stopping flag from a previous recording that
@@ -2039,6 +2169,10 @@ public class RecordingService extends Service {
     @Override
     public void onDestroy() {
         FLog.d(TAG, "onDestroy: Service being destroyed...");
+        // Safety net: drop any in-flight finalization guard (the process is
+        // going away; a stale entry would block future repairs of this file).
+        IN_FLIGHT_FINALIZATIONS.clear();
+        releaseDurationLimitController();
 
         // Stop any active reconnection attempts
         stopReconnectionAttempts();
@@ -2130,6 +2264,14 @@ public class RecordingService extends Service {
 
     // --- Core Recording Logic ---
     private void stopRecording() {
+        if (durationLimitController != null && durationLimitController.stopSession()) {
+            FLog.d(TAG, "Cancelled maximum recording duration for current session");
+        }
+        // The session file is about to be finalized asynchronously on the stop
+        // thread — guard it from the self-healing scan until finalization is
+        // done (see IN_FLIGHT_FINALIZATIONS).
+        final String inFlightUri = getCurrentRecordingMediaUri();
+        addInFlightFinalization(inFlightUri);
         if (isStopping) {
             FLog.w(TAG, "stopRecording: Already in stopping process, ignoring duplicate call");
             return;
@@ -2404,9 +2546,11 @@ public class RecordingService extends Service {
                     }
 
                     FLog.d(TAG, "stopRecording sequence completed successfully");
+                    removeInFlightFinalization(inFlightUri);
                     finalizeJustStoppedRecording();
                 });            } catch (Exception e) {
                 FLog.e(TAG, "Error in stopRecording cleanup thread", e);
+                removeInFlightFinalization(inFlightUri);
                 mainHandler.post(() -> {
                     isStopping = false;
                     pendingStartRecording = false;
@@ -2437,6 +2581,9 @@ public class RecordingService extends Service {
         persistRecordingTimelineState();
         recordingState = RecordingState.PAUSED;
         sharedPreferencesManager.setRecordingInProgress(false);
+        if (durationLimitController != null && durationLimitController.pauseSession()) {
+            FLog.d(TAG, "Paused maximum recording duration countdown");
+        }
         // Notify RemoteStreamManager so status JSON reflects paused state
         com.fadcam.streaming.RemoteStreamManager.getInstance().pauseRecording();
 
@@ -2483,6 +2630,9 @@ public class RecordingService extends Service {
         persistRecordingTimelineState();
         recordingState = RecordingState.IN_PROGRESS;
         sharedPreferencesManager.setRecordingInProgress(true);
+        if (durationLimitController != null && durationLimitController.resumeSession()) {
+            FLog.d(TAG, "Resumed maximum recording duration countdown");
+        }
         // Notify RemoteStreamManager so status JSON reflects resumed (recording) state
         com.fadcam.streaming.RemoteStreamManager.getInstance().resumeRecording();
         
@@ -6568,6 +6718,7 @@ public class RecordingService extends Service {
                 accumulatedPausedDurationMs = 0L;
 
                 persistRecordingTimelineState();
+                startDurationLimitSession();
 
                 // Setup notification
                 setupRecordingInProgressNotification();

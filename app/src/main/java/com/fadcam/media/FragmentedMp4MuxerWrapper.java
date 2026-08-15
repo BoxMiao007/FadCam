@@ -49,7 +49,6 @@ public class FragmentedMp4MuxerWrapper {
     private boolean started = false;
     private boolean released = false;
     private int orientationHint = 0;
-    private int sampleCountDebug = 0;  // For limiting debug log spam
     
     // Track indices
     private int videoTrackIndex = -1;
@@ -649,10 +648,6 @@ public class FragmentedMp4MuxerWrapper {
 
         if ((mediaCodecFlags & MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0) {
             flags |= C.BUFFER_FLAG_KEY_FRAME;
-            if (trackIndex == videoTrackIndex && videoTrackIndex != -1 && sampleCountDebug < 3) {
-                sampleCountDebug++;
-                FLog.d(TAG, "[VLC-VIDEO-CONVERT] Video keyframe flag mapped to Media3 — first 3 keyframes only");
-            }
         }
         
         // DO NOT force audio keyframes
@@ -804,6 +799,20 @@ public class FragmentedMp4MuxerWrapper {
             logFileState("after finalization (original channel)");
             FLog.i(TAG, "Hybrid MP4 finalization succeeded (original channel)");
             lastFinalizeOutcome = "OK (original channel)";
+            // ── Post-finalize self-audit: read back the FIRST VIDEO sample from
+            // the file as written and report its framing. This observes the actual
+            // file content (Annex-B vs AVCC vs truncated), so a "successful"
+            // finalization with structurally broken samples is visible in logs
+            // instead of guessed.
+            try {
+                java.nio.channels.FileChannel auditChannel = fileOutputStream.getChannel();
+                auditChannel.position(0);
+                String audit = androidx.media3.muxer.FragmentedMp4Muxer
+                        .auditFirstVideoSample(auditChannel);
+                FLog.i(TAG, "[AVC-AUDIT] first video sample in FILE: " + audit);
+            } catch (Exception auditEx) {
+                FLog.w(TAG, "[AVC-AUDIT] audit failed: " + auditEx);
+            }
             return;
         } catch (Exception e) {
             FLog.w(TAG, "Hybrid finalization failed on original channel (" + e.getMessage()
