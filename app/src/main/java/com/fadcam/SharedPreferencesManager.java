@@ -440,6 +440,36 @@ public class SharedPreferencesManager {
             .apply();
     }
 
+    /** Sidebar mini apps order as pipe-separated ids (e.g. "torch|qr_scanner|compass|..."). */
+    public String getSidebarMiniAppsOrder() {
+        return sharedPreferences.getString(
+            Constants.PREF_SIDEBAR_MINI_APPS_ORDER,
+            Constants.DEFAULT_SIDEBAR_MINI_APPS_ORDER
+        );
+    }
+
+    public void setSidebarMiniAppsOrder(String order) {
+        sharedPreferences
+            .edit()
+            .putString(Constants.PREF_SIDEBAR_MINI_APPS_ORDER, order)
+            .apply();
+    }
+
+    /** How many of the top of the sidebar mini apps order are shown (1..11). */
+    public int getSidebarMiniAppsCount() {
+        return sharedPreferences.getInt(
+            Constants.PREF_SIDEBAR_MINI_APPS_COUNT,
+            Constants.DEFAULT_SIDEBAR_MINI_APPS_COUNT
+        );
+    }
+
+    public void setSidebarMiniAppsCount(int count) {
+        sharedPreferences
+            .edit()
+            .putInt(Constants.PREF_SIDEBAR_MINI_APPS_COUNT, count)
+            .apply();
+    }
+
     public Size getCameraResolution() {
         return new Size(
             sharedPreferences.getInt(
@@ -2337,6 +2367,191 @@ public class SharedPreferencesManager {
         "screen_recording_audio_device_type";
     private static final String PREF_KEY_SCREEN_AUDIO_DEVICE_NAME =
         "screen_recording_audio_device_name";
+
+    // ── Haptic feedback controls (recording events + UI touch haptics) ──
+    private static final String PREF_KEY_HAPTIC_FEEDBACK_ENABLED =
+        "haptic_feedback_enabled";
+    private static final String PREF_KEY_HAPTIC_START_PRESET =
+        "haptic_start_preset";
+    private static final String PREF_KEY_HAPTIC_START_CUSTOM_MS =
+        "haptic_start_custom_ms";
+    private static final String PREF_KEY_HAPTIC_STOP_PRESET =
+        "haptic_stop_preset";
+    private static final String PREF_KEY_HAPTIC_STOP_CUSTOM_MS =
+        "haptic_stop_custom_ms";
+    private static final String PREF_KEY_HAPTIC_UI_ENABLED =
+        "haptic_ui_enabled";
+    private static final String PREF_KEY_HAPTIC_PICKER_ENABLED =
+        "haptic_picker_enabled";
+    private static final String PREF_KEY_HAPTIC_TORCH_PRESET =
+        "haptic_torch_preset";
+    private static final String PREF_KEY_HAPTIC_TORCH_PULSE1_MS =
+        "haptic_torch_pulse1_ms";
+    private static final String PREF_KEY_HAPTIC_TORCH_PULSE2_MS =
+        "haptic_torch_pulse2_ms";
+
+    /** Vibration strength presets per event. */
+    public static final String HAPTIC_PRESET_OFF = "off";
+    public static final String HAPTIC_PRESET_SOFT = "soft";
+    public static final String HAPTIC_PRESET_DEFAULT = "default";
+    public static final String HAPTIC_PRESET_STRONG = "strong";
+    public static final String HAPTIC_PRESET_CUSTOM = "custom";
+
+    /** Master toggle: app-wide vibration/haptics. Default ON. */
+    public boolean isHapticFeedbackEnabled() {
+        return sharedPreferences.getBoolean(
+            PREF_KEY_HAPTIC_FEEDBACK_ENABLED, true);
+    }
+
+    public void setHapticFeedbackEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(PREF_KEY_HAPTIC_FEEDBACK_ENABLED, enabled)
+            .apply();
+    }
+
+    public String getHapticStartPreset() {
+        return sharedPreferences.getString(
+            PREF_KEY_HAPTIC_START_PRESET, HAPTIC_PRESET_DEFAULT);
+    }
+
+    public void setHapticStartPreset(String preset) {
+        sharedPreferences
+            .edit()
+            .putString(PREF_KEY_HAPTIC_START_PRESET, preset)
+            .apply();
+    }
+
+    public int getHapticStartCustomMs() {
+        return sharedPreferences.getInt(PREF_KEY_HAPTIC_START_CUSTOM_MS, 100);
+    }
+
+    public void setHapticStartCustomMs(int ms) {
+        sharedPreferences
+            .edit()
+            .putInt(PREF_KEY_HAPTIC_START_CUSTOM_MS, ms)
+            .apply();
+    }
+
+    public String getHapticStopPreset() {
+        return sharedPreferences.getString(
+            PREF_KEY_HAPTIC_STOP_PRESET, HAPTIC_PRESET_DEFAULT);
+    }
+
+    public void setHapticStopPreset(String preset) {
+        sharedPreferences
+            .edit()
+            .putString(PREF_KEY_HAPTIC_STOP_PRESET, preset)
+            .apply();
+    }
+
+    public int getHapticStopCustomMs() {
+        return sharedPreferences.getInt(PREF_KEY_HAPTIC_STOP_CUSTOM_MS, 300);
+    }
+
+    public void setHapticStopCustomMs(int ms) {
+        sharedPreferences
+            .edit()
+            .putInt(PREF_KEY_HAPTIC_STOP_CUSTOM_MS, ms)
+            .apply();
+    }
+
+    /** UI touch haptics (buttons, long-presses). Default ON. */
+    public boolean isHapticUiEnabled() {
+        return sharedPreferences.getBoolean(PREF_KEY_HAPTIC_UI_ENABLED, true);
+    }
+
+    public void setHapticUiEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(PREF_KEY_HAPTIC_UI_ENABLED, enabled)
+            .apply();
+    }
+
+    /** Number-picker wheel haptics. Default ON. */
+    public boolean isHapticPickerEnabled() {
+        return sharedPreferences.getBoolean(PREF_KEY_HAPTIC_PICKER_ENABLED, true);
+    }
+
+    public void setHapticPickerEnabled(boolean enabled) {
+        sharedPreferences
+            .edit()
+            .putBoolean(PREF_KEY_HAPTIC_PICKER_ENABLED, enabled)
+            .apply();
+    }
+
+    /** Torch-shortcut double-pulse intensity preset. Default ON ("default"). */
+    public String getHapticTorchPreset() {
+        return sharedPreferences.getString(
+            PREF_KEY_HAPTIC_TORCH_PRESET, HAPTIC_PRESET_DEFAULT);
+    }
+
+    public void setHapticTorchPreset(String preset) {
+        sharedPreferences
+            .edit()
+            .putString(PREF_KEY_HAPTIC_TORCH_PRESET, preset)
+            .apply();
+    }
+
+    public int getHapticTorchPulse1Ms() {
+        return sharedPreferences.getInt(PREF_KEY_HAPTIC_TORCH_PULSE1_MS, 90);
+    }
+
+    public void setHapticTorchPulse1Ms(int ms) {
+        sharedPreferences
+            .edit()
+            .putInt(PREF_KEY_HAPTIC_TORCH_PULSE1_MS, ms)
+            .apply();
+    }
+
+    public int getHapticTorchPulse2Ms() {
+        return sharedPreferences.getInt(PREF_KEY_HAPTIC_TORCH_PULSE2_MS, 70);
+    }
+
+    public void setHapticTorchPulse2Ms(int ms) {
+        sharedPreferences
+            .edit()
+            .putInt(PREF_KEY_HAPTIC_TORCH_PULSE2_MS, ms)
+            .apply();
+    }
+
+    /** Resolves a per-event vibration duration (0 = off) from its preset + custom ms. */
+    public long resolveHapticDurationMs(String preset, int customMs, long defaultMs) {
+        if (HAPTIC_PRESET_OFF.equals(preset)) return 0L;
+        if (HAPTIC_PRESET_SOFT.equals(preset)) return Math.max(30L, defaultMs / 2L);
+        if (HAPTIC_PRESET_STRONG.equals(preset)) return defaultMs * 2L;
+        if (HAPTIC_PRESET_CUSTOM.equals(preset)) {
+            return Math.max(0L, Math.min(10_000L, customMs));
+        }
+        return defaultMs;
+    }
+
+    public long getHapticStartDurationMs() {
+        return resolveHapticDurationMs(
+            getHapticStartPreset(), getHapticStartCustomMs(), 100L);
+    }
+
+    public long getHapticStopDurationMs() {
+        return resolveHapticDurationMs(
+            getHapticStopPreset(), getHapticStopCustomMs(), 300L);
+    }
+
+    /** Restores every haptic preference to its default (master ON). */
+    public void resetHapticSettings() {
+        sharedPreferences
+            .edit()
+            .putBoolean(PREF_KEY_HAPTIC_FEEDBACK_ENABLED, true)
+            .putString(PREF_KEY_HAPTIC_START_PRESET, HAPTIC_PRESET_DEFAULT)
+            .putInt(PREF_KEY_HAPTIC_START_CUSTOM_MS, 100)
+            .putString(PREF_KEY_HAPTIC_STOP_PRESET, HAPTIC_PRESET_DEFAULT)
+            .putInt(PREF_KEY_HAPTIC_STOP_CUSTOM_MS, 300)
+            .putBoolean(PREF_KEY_HAPTIC_UI_ENABLED, true)
+            .putBoolean(PREF_KEY_HAPTIC_PICKER_ENABLED, true)
+            .putString(PREF_KEY_HAPTIC_TORCH_PRESET, HAPTIC_PRESET_DEFAULT)
+            .putInt(PREF_KEY_HAPTIC_TORCH_PULSE1_MS, 90)
+            .putInt(PREF_KEY_HAPTIC_TORCH_PULSE2_MS, 70)
+            .apply();
+    }
 
     /** Cast audio input source: PHONE (system routing) or WIRED (explicit device). */
     public String getScreenRecordingAudioInputSource() {

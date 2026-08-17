@@ -397,6 +397,9 @@ public class DualCameraRecordingService extends Service {
         FLog.i(TAG, "Stopping dual camera recording");
         isStopping = true;
         state = DualCameraState.DISABLED;
+        // Tactile confirmation that dual recording stopped (service-side,
+        // gated by the Haptic feedback setting).
+        com.fadcam.Utils.vibrateRecordingStop(this);
         fallbackMode = false;
         useBlackFrameFallback = false;
         isCapturingSnapshot = false;
@@ -1367,6 +1370,9 @@ public class DualCameraRecordingService extends Service {
             state = DualCameraState.RECORDING;
             recordingStartTime = SystemClock.elapsedRealtime();
             prefs.setRecordingInProgress(true);
+            // Tactile confirmation that dual recording started (service-side,
+            // gated by the Haptic feedback setting).
+            com.fadcam.Utils.vibrateRecordingStart(this);
 
             // Save start time for timer recovery
             getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE)
@@ -1510,6 +1516,15 @@ public class DualCameraRecordingService extends Service {
                     FLog.i(TAG, "Maximum recording duration reached; stopping current dual recording");
                     handleStopDualRecording();
                 });
+
+        // Haptic tick for the final 10 seconds of the countdown (gated by the
+        // master + "Buttons & controls" toggles inside Utils).
+        durationLimitController.setRemainingTickListener(remainingSeconds -> {
+            try {
+                com.fadcam.Utils.vibrateCountdownTick(DualCameraRecordingService.this, remainingSeconds);
+            } catch (Exception ignored) {
+            }
+        });
 
         durationPreferenceListener = (preferences, key) -> {
             boolean customValueKey =

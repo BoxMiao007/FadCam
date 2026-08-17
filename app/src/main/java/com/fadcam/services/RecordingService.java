@@ -352,6 +352,15 @@ public class RecordingService extends Service {
                     stopRecording();
                 });
 
+        // Haptic tick for the final 10 seconds of the countdown (gated by the
+        // master + "Buttons & controls" toggles inside Utils).
+        durationLimitController.setRemainingTickListener(remainingSeconds -> {
+            try {
+                com.fadcam.Utils.vibrateCountdownTick(RecordingService.this, remainingSeconds);
+            } catch (Exception ignored) {
+            }
+        });
+
         durationPreferenceListener = (preferences, key) -> {
             boolean customValueKey =
                     SharedPreferencesManager.PREF_MAX_RECORDING_DURATION_CUSTOM_MINUTES.equals(key)
@@ -5405,6 +5414,10 @@ public class RecordingService extends Service {
     }
 
     private void broadcastOnRecordingStopped() {
+        // Tactile confirmation that recording stopped — fired at the earliest
+        // stop-confirmed point (before any heavy cleanup that could throw), so
+        // it works for widgets, tiles, shortcuts and background stops too.
+        com.fadcam.Utils.vibrateRecordingStop(this);
         Intent broadcastIntent = new Intent(Constants.BROADCAST_ON_RECORDING_STOPPED);
         sendBroadcast(broadcastIntent);
     }
@@ -5808,6 +5821,12 @@ public class RecordingService extends Service {
                     prefs.edit()
                         .putBoolean(Constants.PREF_TORCH_STATE, isRecordingTorchEnabled)
                         .apply();
+
+                    // Same heartbeat haptic as the torch shortcut intent, for consistency.
+                    try {
+                        com.fadcam.Utils.vibrateTorchShortcut(this, isRecordingTorchEnabled);
+                    } catch (Exception ignored) {
+                    }
 
                 } catch (CameraAccessException e) {
                     FLog.e(TAG, "Could not toggle recording torch via CaptureRequest: " + e.getMessage());
@@ -6719,6 +6738,11 @@ public class RecordingService extends Service {
 
                 persistRecordingTimelineState();
                 startDurationLimitSession();
+
+                // Tactile confirmation that recording actually started — fired
+                // from the SERVICE so it works for widgets, tiles, shortcuts and
+                // background starts too (gated by the Haptic feedback setting).
+                com.fadcam.Utils.vibrateRecordingStart(this);
 
                 // Setup notification
                 setupRecordingInProgressNotification();
