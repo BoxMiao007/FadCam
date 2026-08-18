@@ -32,7 +32,7 @@ android {
         minSdk = 24
         targetSdk = 36
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 50
+        versionCode = 51
         versionName = "4.0.0"
         vectorDrawables.useSupportLibrary = true
         
@@ -67,7 +67,7 @@ android {
         debug {
             applicationIdSuffix = ".beta"
             isDebuggable = true
-            versionNameSuffix = "-beta10.5" // Increment the beta version suffix for each release. Use `beta1` for the first beta release, then `beta2`, etc.
+            versionNameSuffix = "-beta10.6" // Increment the beta version suffix for each release. Use `beta1` for the first beta release, then `beta2`, etc.
             resValue("string", "app_name", "FadCam Beta")
         }
         
@@ -163,6 +163,18 @@ android {
                     variant.enable = false
                 }
             }
+        }
+    }
+
+    // Dynamic APK output names: FadCam_<flavor>_v<versionName><suffix>-<abi>.apk
+    // (default flavor has no <flavor> part; universal APK gets the literal "-universal")
+    applicationVariants.all {
+        val versionName = "${defaultConfig.versionName}${buildType.versionNameSuffix.orEmpty()}"
+        val flavor = if (flavorName != "default") "${flavorName}_" else ""
+        outputs.all {
+            val abiType = filters.firstOrNull { it.filterType == com.android.build.OutputFile.ABI }?.identifier ?: "universal"
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+                "FadCam_${flavor}v${versionName}-${abiType}.apk"
         }
     }
 
