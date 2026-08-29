@@ -172,8 +172,12 @@ android {
         val versionName = "${defaultConfig.versionName}${buildType.versionNameSuffix.orEmpty()}"
         val flavor = if (flavorName != "default") "${flavorName}_" else ""
         outputs.all {
-            val abiType = filters.firstOrNull { it.filterType == com.android.build.OutputFile.ABI }?.identifier ?: "universal"
-            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+            val abiType = output.filters
+                .firstOrNull { it.filterType == "ABI" }
+                ?.identifier
+                ?: "universal"
+            output.outputFileName =
                 "FadCam_${flavor}v${versionName}-${abiType}.apk"
         }
     }
@@ -181,6 +185,13 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests {
+            // Robolectric provides Android framework classes on the JVM.
+            isIncludeAndroidResources = true
+        }
     }
 
     dependenciesInfo {
@@ -318,10 +329,11 @@ dependencies {
 
     // Unit Testing Dependencies (Local JVM tests - fast, no device needed)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
     testImplementation("org.mockito:mockito-core:5.2.0")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
     testImplementation("org.json:json:20240303")
-    
+
     // Android Instrumented Testing (runs on device/emulator)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
