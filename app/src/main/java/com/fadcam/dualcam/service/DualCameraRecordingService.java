@@ -34,7 +34,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fadcam.Constants;
 import com.fadcam.MaximumRecordingDuration;
@@ -574,7 +573,7 @@ public class DualCameraRecordingService extends Service {
      * @param intent Intent containing "SURFACE" extra and optional dimensions.
      */
     private void handleChangeSurface(@NonNull Intent intent) {
-        Surface surface = intent.getParcelableExtra("SURFACE");
+        Surface surface = com.fadcam.Utils.getParcelableExtraCompat(intent, "SURFACE", android.view.Surface.class);
         int surfaceW = intent.getIntExtra("SURFACE_WIDTH", 0);
         int surfaceH = intent.getIntExtra("SURFACE_HEIGHT", 0);
         boolean isFullscreenTransition = intent.getBooleanExtra("IS_FULLSCREEN_TRANSITION", false);
@@ -665,7 +664,7 @@ public class DualCameraRecordingService extends Service {
         }
         Intent mirrorBcast = new Intent(Constants.BROADCAST_ON_MIRROR_CHANGED);
         mirrorBcast.putExtra(Constants.EXTRA_MIRROR_ENABLED, enabled);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(mirrorBcast);
+        this.sendBroadcast(mirrorBcast.setPackage(this.getPackageName()));
         FLog.i(TAG, "Front video mirror set: " + enabled);
     }
 
@@ -1074,6 +1073,7 @@ public class DualCameraRecordingService extends Service {
      * Captures a single frame from the given camera device targeting the
      * pipeline's secondary SurfaceTexture, then closes the camera.
      */
+    @SuppressWarnings("deprecation") // legacy createCaptureSession fallback for < API 28
     private void captureOneFrameAndClose(@NonNull CameraDevice camera) {
         try {
             Surface secondarySurface = recordingPipeline.getSecondaryCameraInputSurface();
@@ -1086,9 +1086,14 @@ public class DualCameraRecordingService extends Service {
             builder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON);
 
-            camera.createCaptureSession(
-                    Collections.singletonList(secondarySurface),
-                    new CameraCaptureSession.StateCallback() {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            android.hardware.camera2.params.SessionConfiguration sessionConfig =
+                    new android.hardware.camera2.params.SessionConfiguration(
+                            android.hardware.camera2.params.SessionConfiguration.SESSION_REGULAR,
+                            Collections.singletonList(
+                                    new android.hardware.camera2.params.OutputConfiguration(secondarySurface)),
+                            backgroundHandler::post,
+                            new android.hardware.camera2.CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
                             if (isStopping) {
@@ -1140,8 +1145,48 @@ public class DualCameraRecordingService extends Service {
                             isCapturingSnapshot = false;
                             scheduleNextSnapshot();
                         }
-                    },
-                    backgroundHandler);
+                    });
+
+            camera.createCaptureSession(sessionConfig);
+            } else {
+                camera.createCaptureSession(
+                        Collections.singletonList(secondarySurface),
+                        new android.hardware.camera2.CameraCaptureSession.StateCallback() {
+                            @Override
+                            public void onConfigured(@NonNull CameraCaptureSession session) {
+                                try {
+                                    session.capture(builder.build(),
+                                            new android.hardware.camera2.CameraCaptureSession.CaptureCallback() {
+                                                @Override
+                                                public void onCaptureCompleted(
+                                                        @NonNull CameraCaptureSession s,
+                                                        @NonNull CaptureRequest request,
+                                                        @NonNull android.hardware.camera2.TotalCaptureResult result) {
+                                                    session.close();
+                                                    camera.close();
+                                                    isCapturingSnapshot = false;
+                                                    scheduleNextSnapshot();
+                                                }
+                                            }, backgroundHandler);
+                                } catch (CameraAccessException e) {
+                                    FLog.w(TAG, "Fallback: capture request failed", e);
+                                    session.close();
+                                    camera.close();
+                                    isCapturingSnapshot = false;
+                                    scheduleNextSnapshot();
+                                }
+                            }
+
+                            @Override
+                            public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                                FLog.w(TAG, "Fallback: snapshot session config failed");
+                                session.close();
+                                camera.close();
+                                isCapturingSnapshot = false;
+                                scheduleNextSnapshot();
+                            }
+                        }, backgroundHandler);
+            }
 
         } catch (CameraAccessException e) {
             FLog.w(TAG, "Fallback: error setting up snapshot session", e);
@@ -1294,6 +1339,7 @@ public class DualCameraRecordingService extends Service {
     /**
      * Creates a Camera2 capture session that targets the given surface.
      */
+    @SuppressWarnings("deprecation") // legacy createCaptureSession fallback for < API 28
     private void createCaptureSession(
             @NonNull CameraDevice camera,
             @NonNull Surface targetSurface,
@@ -1310,9 +1356,14 @@ public class DualCameraRecordingService extends Service {
             builder.set(CaptureRequest.CONTROL_AE_MODE,
                     CaptureRequest.CONTROL_AE_MODE_ON);
 
-            camera.createCaptureSession(
-                    Collections.singletonList(targetSurface),
-                    new CameraCaptureSession.StateCallback() {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            android.hardware.camera2.params.SessionConfiguration sessionConfig =
+                    new android.hardware.camera2.params.SessionConfiguration(
+                            android.hardware.camera2.params.SessionConfiguration.SESSION_REGULAR,
+                            Collections.singletonList(
+                                    new android.hardware.camera2.params.OutputConfiguration(targetSurface)),
+                            backgroundHandler::post,
+                            new CameraCaptureSession.StateCallback() {
                         @Override
                         public void onConfigured(@NonNull CameraCaptureSession session) {
                             if (isStopping) return;
@@ -1345,8 +1396,43 @@ public class DualCameraRecordingService extends Service {
                                     + " capture session configuration failed");
                             transitionToError("Camera session failed");
                         }
-                    },
-                    backgroundHandler);
+                    });
+
+            camera.createCaptureSession(sessionConfig);
+            } else {
+                camera.createCaptureSession(
+                        Collections.singletonList(targetSurface),
+                        new CameraCaptureSession.StateCallback() {
+                            @Override
+                            public void onConfigured(@NonNull CameraCaptureSession session) {
+                                if (isStopping) return;
+                                try {
+                                    session.setRepeatingRequest(builder.build(), null, backgroundHandler);
+                                } catch (CameraAccessException e) {
+                                    FLog.e(TAG, "Failed to start repeating request", e);
+                                    transitionToError("Capture request failed");
+                                    return;
+                                }
+                                if (isPrimary) {
+                                    primarySession = session;
+                                    primaryRequestBuilder = builder;
+                                } else {
+                                    secondarySession = session;
+                                    secondaryRequestBuilder = builder;
+                                }
+                                FLog.d(TAG, (isPrimary ? "Primary" : "Secondary")
+                                        + " capture session configured");
+                                onSessionConfigured(isPrimary);
+                            }
+
+                            @Override
+                            public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+                                FLog.e(TAG, (isPrimary ? "Primary" : "Secondary")
+                                        + " capture session configuration failed");
+                                transitionToError("Camera session failed");
+                            }
+                        }, backgroundHandler);
+            }
 
         } catch (CameraAccessException e) {
             FLog.e(TAG, "Error creating capture session", e);

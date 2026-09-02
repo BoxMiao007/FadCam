@@ -1903,7 +1903,7 @@ public class GLRecordingPipeline {
                     }
 
                     // Check for valid data before writing to muxer
-                    boolean isKeyframe = (bufferInfo.flags & MediaCodec.BUFFER_FLAG_SYNC_FRAME) != 0;
+                    boolean isKeyframe = (bufferInfo.flags & MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0;
 
                     // Preemptive keyframe request when near threshold (only once)
                     if (!pendingRollover && maxFileSizeBytes > 0 && segmentBytesWritten >= (long) (maxFileSizeBytes * ROLLOVER_PREEMPT_THRESHOLD_RATIO)) {
@@ -2548,6 +2548,7 @@ public class GLRecordingPipeline {
      * 3. THEN finalize muxer
      * 4. THEN release all resources
      */
+    @SuppressWarnings("deprecation") // legacy BT SCO / speakerphone APIs for older devices
     public void stopRecording() {
         // stop log removed
         try {
@@ -2762,7 +2763,7 @@ public class GLRecordingPipeline {
                     audioManager.setMode(originalAudioMode);
                     FLog.i(TAG, "AudioManager mode restored to: " + originalAudioMode);
                 }
-                audioManager.setSpeakerphoneOn(originalSpeakerphoneOn);
+                setSpeakerphoneOnCompat(audioManager, originalSpeakerphoneOn);
                 // Stop BT SCO if it was started
                 if (isBtSco) {
                     try {
@@ -3309,6 +3310,43 @@ public class GLRecordingPipeline {
     }
 
     /**
+     * setSpeakerphoneOn is deprecated in API 31 in favor of setCommunicationDevice.
+     * This keeps the legacy behavior with a modern path where available.
+     */
+    @SuppressWarnings("deprecation")
+    private void setSpeakerphoneOnCompat(android.media.AudioManager am, boolean on) {
+        if (am == null) return;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            try {
+                java.util.List<android.media.AudioDeviceInfo> devices = am.getAvailableCommunicationDevices();
+                android.media.AudioDeviceInfo speaker = null;
+                for (android.media.AudioDeviceInfo d : devices) {
+                    if (d.getType() == android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+                        speaker = d;
+                        break;
+                    }
+                }
+                if (speaker != null) {
+                    if (on) {
+                        am.setCommunicationDevice(speaker);
+                    } else {
+                        android.media.AudioDeviceInfo earpiece = null;
+                        for (android.media.AudioDeviceInfo d : devices) {
+                            if (d.getType() == android.media.AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                                earpiece = d;
+                                break;
+                            }
+                        }
+                        am.setCommunicationDevice(earpiece);
+                    }
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+        am.setSpeakerphoneOn(on);
+    }
+
+    /**
      * Initializes audio settings from SharedPreferencesManager.
      * This should be called before starting audio recording/encoding.
      */
@@ -3413,6 +3451,7 @@ public class GLRecordingPipeline {
      * Sets up the audio encoder and AudioRecord for AAC audio capture.
      * Call before starting audio thread.
      */
+    @SuppressWarnings("deprecation") // legacy BT SCO / speakerphone APIs for older devices
     private void setupAudio() {
         if (!audioRecordingEnabled) {
             return;
@@ -3508,11 +3547,11 @@ public class GLRecordingPipeline {
                     audioManager.startBluetoothSco();
                     audioManager.setBluetoothScoOn(true);
                     audioManager.setMode(android.media.AudioManager.MODE_IN_COMMUNICATION);
-                    audioManager.setSpeakerphoneOn(false);
+                    setSpeakerphoneOnCompat(audioManager, false);
                     FLog.i(TAG, "AudioManager: BT SCO started, mode=MODE_IN_COMMUNICATION");
                 } else {
                     audioManager.setMode(android.media.AudioManager.MODE_NORMAL);
-                    audioManager.setSpeakerphoneOn(true);
+                    setSpeakerphoneOnCompat(audioManager, true);
                     FLog.i(TAG, "AudioManager mode set to MODE_NORMAL for camcorder recording (was: " + originalAudioMode + "), speakerphone enabled");
                 }
                 

@@ -188,6 +188,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private static final long SCRUB_GRACE_PERIOD_MS = 1000L; // 1 second grace period after scrub
 
     @Override
+    @SuppressWarnings("deprecation") // FLAG_TRANSLUCENT_STATUS deprecated; still needed for this legacy window
     protected void onCreate(Bundle savedInstanceState) {
         // Initialize SharedPreferencesManager for theme
         SharedPreferencesManager sharedPreferencesManager =
@@ -296,7 +297,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
             );
-            getWindow().setStatusBarColor(statusBarColor);
+            com.fadcam.util.SystemBarUtil.setStatusBarColor(getWindow(), statusBarColor);
         } catch (Exception e) {
             FLog.w(TAG, "Failed to set status bar color", e);
         }
@@ -1653,9 +1654,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
                     );
                     i.putExtra(EXTRA_URI, cur.toString());
                     i.putExtra(EXTRA_POSITION_MS, pos);
-                    androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(
-                        this
-                    ).sendBroadcast(i);
+                    sendBroadcast(i.setPackage(getPackageName()));
                 } catch (Exception ignored) {}
             }
         } catch (Exception e) {
@@ -2986,13 +2985,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 }
             } else {
                 final View decor = getWindow().getDecorView();
-                decor.setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                );
+                com.fadcam.util.SystemBarUtil.hideSystemBars(decor);
             }
         } catch (Exception ignored) {}
 

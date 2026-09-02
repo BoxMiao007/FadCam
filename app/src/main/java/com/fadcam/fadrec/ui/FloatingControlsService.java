@@ -20,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fadcam.Constants;
 import com.fadcam.R;
@@ -89,7 +88,7 @@ public class FloatingControlsService extends Service {
         // Set up window parameters
         int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                : WindowManager.LayoutParams.TYPE_PHONE;
+                : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -245,7 +244,7 @@ public class FloatingControlsService extends Service {
         // Set up window parameters for menu
         int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                : WindowManager.LayoutParams.TYPE_PHONE;
+                : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         
         WindowManager.LayoutParams menuParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -289,7 +288,7 @@ public class FloatingControlsService extends Service {
         
         // Always show chevron_right icon - menu expands on click
         btnFloating.setText("chevron_right");
-        btnFloating.setTextColor(getResources().getColor(android.R.color.white));
+        btnFloating.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
     }
 
     private void updateQuickMenuButtons() {
@@ -300,13 +299,13 @@ public class FloatingControlsService extends Service {
                 // Start/Stop button shows "Start" (enabled)
                 btnStartStop.setEnabled(true);
                 iconStartStop.setText("fiber_manual_record");
-                iconStartStop.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+                iconStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_light));
                 labelStartStop.setText(R.string.floating_menu_start_short);
                 
                 // Pause/Resume button is disabled
                 btnPauseResume.setEnabled(false);
                 iconPauseResume.setText("pause");
-                iconPauseResume.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                iconPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.darker_gray));
                 labelPauseResume.setText(R.string.floating_menu_pause);
                 break;
                 
@@ -314,13 +313,13 @@ public class FloatingControlsService extends Service {
                 // Start/Stop button shows "Stop" (enabled)
                 btnStartStop.setEnabled(true);
                 iconStartStop.setText("stop");
-                iconStartStop.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                iconStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light));
                 labelStartStop.setText(R.string.floating_menu_stop_short);
                 
                 // Pause/Resume button shows "Pause" (enabled)
                 btnPauseResume.setEnabled(true);
                 iconPauseResume.setText("pause");
-                iconPauseResume.setTextColor(getResources().getColor(android.R.color.holo_orange_light));
+                iconPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_orange_light));
                 labelPauseResume.setText(R.string.floating_menu_pause);
                 break;
                 
@@ -328,13 +327,13 @@ public class FloatingControlsService extends Service {
                 // Start/Stop button shows "Stop" (enabled)
                 btnStartStop.setEnabled(true);
                 iconStartStop.setText("stop");
-                iconStartStop.setTextColor(getResources().getColor(android.R.color.holo_red_light));
+                iconStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light));
                 labelStartStop.setText(R.string.floating_menu_stop_short);
                 
                 // Pause/Resume button shows "Resume" (enabled)
                 btnPauseResume.setEnabled(true);
                 iconPauseResume.setText("play_arrow");
-                iconPauseResume.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+                iconPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_light));
                 labelPauseResume.setText(R.string.floating_menu_resume);
                 break;
         }
@@ -374,7 +373,7 @@ public class FloatingControlsService extends Service {
         
         IntentFilter filter = new IntentFilter(Constants.BROADCAST_ON_SCREEN_RECORDING_STATE_CALLBACK);
         // Use LocalBroadcastManager for guaranteed delivery on Android 12+
-        LocalBroadcastManager.getInstance(this).registerReceiver(stateReceiver, filter);
+        androidx.core.content.ContextCompat.registerReceiver(this, stateReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED);
     }
 
     @Override
@@ -391,7 +390,7 @@ public class FloatingControlsService extends Service {
         }
         
         if (stateReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(stateReceiver);
+            this.unregisterReceiver(stateReceiver);
         }
     }
 }

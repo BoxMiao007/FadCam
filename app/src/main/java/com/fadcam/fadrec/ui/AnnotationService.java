@@ -49,7 +49,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.util.List;
@@ -333,7 +332,7 @@ public class AnnotationService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             } else {
-                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             }
         }
 
@@ -474,7 +473,7 @@ public class AnnotationService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 deleteAllDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             } else {
-                deleteAllDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                deleteAllDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             }
         }
 
@@ -600,7 +599,7 @@ public class AnnotationService extends Service {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     deleteDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
                 } else {
-                    deleteDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                    deleteDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
                 }
             }
 
@@ -831,7 +830,7 @@ public class AnnotationService extends Service {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startupDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             } else {
-                startupDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+                startupDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             }
         }
         
@@ -961,7 +960,7 @@ public class AnnotationService extends Service {
 
         int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                : WindowManager.LayoutParams.TYPE_PHONE;
+                : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
         annotationCanvasParams = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -980,6 +979,7 @@ public class AnnotationService extends Service {
         FLog.d(TAG, "Annotation canvas added to window with saved state");
     }
 
+    @SuppressWarnings("deprecation") // legacy getDefaultDisplay/getMetrics fallback for < API 30
     private void setupToolbar() {
         LayoutInflater inflater = LayoutInflater.from(this);
 
@@ -989,7 +989,7 @@ public class AnnotationService extends Service {
 
         int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                : WindowManager.LayoutParams.TYPE_PHONE;
+                : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
 
         // ===== ARROW OVERLAY SETUP =====
         arrowOverlay = inflater.inflate(R.layout.annotation_arrow_button, null);
@@ -1926,6 +1926,7 @@ public class AnnotationService extends Service {
      * Snap toolbar to nearest screen edge if close enough
      * Updates both arrow and menu overlays together
      */
+    @SuppressWarnings("deprecation") // legacy getDefaultDisplay/getMetrics fallback for < API 30
     private void snapToEdgeIfNeeded() {
         FLog.d(TAG, ">>> snapToEdgeIfNeeded() called");
         FLog.d(TAG, "Arrow params - x: " + arrowParams.x + ", y: " + arrowParams.y);
@@ -2069,6 +2070,7 @@ public class AnnotationService extends Service {
         updateArrowDirection(params, false);
     }
 
+    @SuppressWarnings("deprecation") // legacy getDefaultDisplay/getMetrics fallback for < API 30
     private void updateArrowDirection(WindowManager.LayoutParams params, boolean forceHint) {
         FLog.d(TAG, ">>> updateArrowDirection() called");
         FLog.d(TAG, "WindowManager params IN - x: " + params.x + ", y: " + params.y + ", gravity: " + params.gravity);
@@ -3234,7 +3236,7 @@ public class AnnotationService extends Service {
 
         IntentFilter filter = new IntentFilter(com.fadcam.Constants.BROADCAST_ON_SCREEN_RECORDING_STATE_CALLBACK);
         // Use LocalBroadcastManager for guaranteed delivery on Android 12+
-        LocalBroadcastManager.getInstance(this).registerReceiver(recordingStateReceiver, filter);
+        androidx.core.content.ContextCompat.registerReceiver(this, recordingStateReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED);
         FLog.d(TAG, "[BROADCAST] Recording state receiver registered via LocalBroadcastManager");
     }
 
@@ -3449,7 +3451,7 @@ public class AnnotationService extends Service {
         };
         
         IntentFilter filter = new IntentFilter(BaseTransparentEditorActivity.ACTION_EDITOR_RESULT);
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).registerReceiver(textEditorResultReceiver, filter);
+        androidx.core.content.ContextCompat.registerReceiver(this, textEditorResultReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED);
         FLog.d(TAG, "Text editor result receiver registered");
         
         // Register editor lifecycle receivers (start/finish)
@@ -3493,7 +3495,7 @@ public class AnnotationService extends Service {
         IntentFilter lifecycleFilter = new IntentFilter();
         lifecycleFilter.addAction(BaseTransparentEditorActivity.ACTION_EDITOR_STARTED);
         lifecycleFilter.addAction(BaseTransparentEditorActivity.ACTION_EDITOR_FINISHED);
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).registerReceiver(editorLifecycleReceiver, lifecycleFilter);
+        androidx.core.content.ContextCompat.registerReceiver(this, editorLifecycleReceiver, lifecycleFilter, android.content.Context.RECEIVER_NOT_EXPORTED);
         FLog.d(TAG, "Editor lifecycle receiver registered");
     }
     
@@ -3668,7 +3670,7 @@ public class AnnotationService extends Service {
         if (dialog.getWindow() != null) {
             int layoutType = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                     ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                    : WindowManager.LayoutParams.TYPE_PHONE;
+                    : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
             dialog.getWindow().setType(layoutType);
             dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         }
@@ -3872,11 +3874,11 @@ public class AnnotationService extends Service {
                 btnStartStopRec.setEnabled(true);
                 btnStartStopRec.setAlpha(1.0f);
                 btnStartStopRec.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                        getResources().getColor(android.R.color.holo_red_light)));
+                        androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light)));
                 iconStartStop.setText("stop");
-                iconStartStop.setTextColor(getResources().getColor(android.R.color.white));
+                iconStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 labelStartStop.setText(R.string.floating_menu_stop_short);
-                labelStartStop.setTextColor(getResources().getColor(android.R.color.white));
+                labelStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
 
                 // Pause button - enabled with darker orange background for better contrast
                 btnPauseResumeRec.setEnabled(true);
@@ -3884,9 +3886,9 @@ public class AnnotationService extends Service {
                 btnPauseResumeRec.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
                         android.graphics.Color.parseColor("#EF6C00"))); // Darker orange (Material Orange 800)
                 iconPauseResume.setText("pause");
-                iconPauseResume.setTextColor(getResources().getColor(android.R.color.white));
+                iconPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 labelPauseResume.setText(R.string.floating_menu_pause);
-                labelPauseResume.setTextColor(getResources().getColor(android.R.color.white));
+                labelPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 break;
 
             case PAUSED:
@@ -3899,11 +3901,11 @@ public class AnnotationService extends Service {
                 btnStartStopRec.setEnabled(true);
                 btnStartStopRec.setAlpha(1.0f);
                 btnStartStopRec.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                        getResources().getColor(android.R.color.holo_red_light)));
+                        androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_red_light)));
                 iconStartStop.setText("stop");
-                iconStartStop.setTextColor(getResources().getColor(android.R.color.white));
+                iconStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 labelStartStop.setText(R.string.floating_menu_stop_short);
-                labelStartStop.setTextColor(getResources().getColor(android.R.color.white));
+                labelStartStop.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
 
                 // Resume button - enabled with same green as main button (#4CAF50)
                 btnPauseResumeRec.setEnabled(true);
@@ -3911,9 +3913,9 @@ public class AnnotationService extends Service {
                 btnPauseResumeRec.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
                         android.graphics.Color.parseColor("#4CAF50"))); // Same green as "Ready to record" button
                 iconPauseResume.setText("play_arrow");
-                iconPauseResume.setTextColor(getResources().getColor(android.R.color.white));
+                iconPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 labelPauseResume.setText(R.string.floating_menu_resume);
-                labelPauseResume.setTextColor(getResources().getColor(android.R.color.white));
+                labelPauseResume.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white));
                 break;
         }
     }
@@ -4039,14 +4041,14 @@ public class AnnotationService extends Service {
         if (enabled) {
             // Annotation ENABLED - ready to draw
             iconAnnotation.setText("edit");
-            iconAnnotation.setTextColor(getResources().getColor(android.R.color.holo_green_light));
+            iconAnnotation.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_light));
             labelAnnotation.setText(getString(R.string.annotation_disable));
             descAnnotation.setText(getString(R.string.annotation_disable_desc));
             Toast.makeText(this, "✏️ Annotation Enabled - Draw freely", Toast.LENGTH_SHORT).show();
         } else {
             // Annotation DISABLED - can use phone normally
             iconAnnotation.setText("edit_off");
-            iconAnnotation.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            iconAnnotation.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.darker_gray));
             labelAnnotation.setText(getString(R.string.annotation_enable));
             descAnnotation.setText("Enable to use annotation tools");
             Toast.makeText(this, "📱 Annotation Disabled - Use phone normally", Toast.LENGTH_SHORT).show();
@@ -4087,14 +4089,14 @@ public class AnnotationService extends Service {
         if (visible) {
             // Canvas VISIBLE - all layers shown
             iconCanvas.setText("visibility");
-            iconCanvas.setTextColor(getResources().getColor(android.R.color.holo_blue_light));
+            iconCanvas.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_blue_light));
             labelCanvas.setText(getString(R.string.annotation_hide_canvas));
             descCanvas.setText(getString(R.string.annotation_hide_canvas_desc));
             Toast.makeText(this, "👁️ Canvas Visible", Toast.LENGTH_SHORT).show();
         } else {
             // Canvas HIDDEN - only pinned layers shown
             iconCanvas.setText("visibility_off");
-            iconCanvas.setTextColor(getResources().getColor(android.R.color.darker_gray));
+            iconCanvas.setTextColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.darker_gray));
             labelCanvas.setText("Show Canvas");
             descCanvas.setText("Pinned layers still visible");
             Toast.makeText(this, "Canvas Hidden - Pinned layers still visible", Toast.LENGTH_SHORT).show();
@@ -4390,7 +4392,7 @@ public class AnnotationService extends Service {
             unregisterReceiver(menuActionReceiver);
         }
         if (recordingStateReceiver != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(recordingStateReceiver);
+            this.unregisterReceiver(recordingStateReceiver);
         }
         if (colorPickerReceiver != null) {
             unregisterReceiver(colorPickerReceiver);
@@ -4408,10 +4410,10 @@ public class AnnotationService extends Service {
             unregisterReceiver(pageRenameReceiver);
         }
         if (textEditorResultReceiver != null) {
-            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).unregisterReceiver(textEditorResultReceiver);
+            this.unregisterReceiver(textEditorResultReceiver);
         }
         if (editorLifecycleReceiver != null) {
-            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).unregisterReceiver(editorLifecycleReceiver);
+            this.unregisterReceiver(editorLifecycleReceiver);
         }
 
         // Stop auto-save timer

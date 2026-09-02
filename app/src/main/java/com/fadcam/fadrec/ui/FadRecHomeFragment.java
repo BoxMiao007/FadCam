@@ -28,7 +28,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fadcam.Constants;
 import com.fadcam.R;
@@ -1297,9 +1296,9 @@ public class FadRecHomeFragment extends HomeFragment {
                         // Handle permission results from TransparentPermissionActivity
                         case Constants.ACTION_SCREEN_RECORDING_PERMISSION_GRANTED:
                             // Permission granted, start recording with the provided Intent
-                            Intent permissionData = intent.getParcelableExtra("data");
+                            Intent permissionData = com.fadcam.Utils.getParcelableExtraCompat(intent, "data", Intent.class);
                             if (permissionData == null) {
-                                permissionData = intent.getParcelableExtra("mediaProjectionData");
+                                permissionData = com.fadcam.Utils.getParcelableExtraCompat(intent, "mediaProjectionData", Intent.class);
                             }
                             if (permissionData != null && mediaProjectionHelper != null) {
                                 int resultCode = intent.getIntExtra("resultCode", -1);
@@ -1366,7 +1365,7 @@ public class FadRecHomeFragment extends HomeFragment {
             
             // Use LocalBroadcastManager for guaranteed delivery on Android 12+
             // This bypasses the background app broadcast restrictions
-            LocalBroadcastManager.getInstance(requireContext()).registerReceiver(screenRecordingStateReceiver, filter);
+            androidx.core.content.ContextCompat.registerReceiver(requireContext(), screenRecordingStateReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED);
             
             isScreenRecordingReceiverRegistered = true;
         } catch (IllegalArgumentException e) {
@@ -2066,7 +2065,7 @@ public class FadRecHomeFragment extends HomeFragment {
             android.view.WindowManager wm = (android.view.WindowManager)
                 requireContext().getSystemService(android.content.Context.WINDOW_SERVICE);
             android.util.DisplayMetrics dm = new android.util.DisplayMetrics();
-            wm.getDefaultDisplay().getRealMetrics(dm);
+            com.fadcam.Utils.getRealDisplayMetrics(requireContext(), dm);
             long pixels   = (long) dm.widthPixels * dm.heightPixels;
             long fps       = Constants.DEFAULT_SCREEN_RECORDING_FPS;
             long bitrate   = (long) (pixels * fps * 0.07);

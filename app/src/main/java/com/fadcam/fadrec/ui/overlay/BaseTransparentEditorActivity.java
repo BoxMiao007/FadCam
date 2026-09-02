@@ -16,7 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 
 /**
  * Base transparent fullscreen activity for all editing overlays.
@@ -59,8 +59,8 @@ public abstract class BaseTransparentEditorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(0);
-        getWindow().setNavigationBarColor(0);
+        com.fadcam.util.SystemBarUtil.setStatusBarColor(getWindow(), 0);
+        com.fadcam.util.SystemBarUtil.setNavigationBarColor(getWindow(), 0);
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         setContentView(getLayoutResourceId());
 
@@ -110,6 +110,7 @@ public abstract class BaseTransparentEditorActivity extends AppCompatActivity {
     /**
      * Setup window for transparent overlay appearance
      */
+    @SuppressWarnings("deprecation") // SOFT_INPUT_ADJUST_RESIZE has no direct modern replacement for overlay windows
     private void setupTransparentWindow() {
         // CRITICAL: Show on top of other app overlays (like AnnotationService overlay)
         getWindow().setFlags(
@@ -150,17 +151,17 @@ public abstract class BaseTransparentEditorActivity extends AppCompatActivity {
         Intent broadcast = new Intent(ACTION_EDITOR_RESULT);
         broadcast.putExtra(EXTRA_RESULT_CODE, RESULT_SAVE);
         broadcast.putExtra(EXTRA_RESULT_DATA, resultData);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+        this.sendBroadcast(broadcast.setPackage(this.getPackageName()));
         
         // Notify editor finished (re-enable annotation canvas)
         Intent finishBroadcast = new Intent(ACTION_EDITOR_FINISHED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(finishBroadcast);
+        this.sendBroadcast(finishBroadcast.setPackage(this.getPackageName()));
         
         // Also set Activity result
         resultData.putString(EXTRA_RESULT_ACTION, ACTION_SAVE);
         setResult(RESULT_OK, getIntent().putExtras(resultData));
         finish();
-        overridePendingTransition(0, 0); // No animation
+        com.fadcam.Utils.overridePendingTransitionCompat(this, 0, 0); // No animation
     }
     
     /**
@@ -170,17 +171,17 @@ public abstract class BaseTransparentEditorActivity extends AppCompatActivity {
         // Send broadcast for AnnotationService
         Intent broadcast = new Intent(ACTION_EDITOR_RESULT);
         broadcast.putExtra(EXTRA_RESULT_CODE, RESULT_CANCELLED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+        this.sendBroadcast(broadcast.setPackage(this.getPackageName()));
         
         // Notify editor finished (re-enable annotation canvas)
         Intent finishBroadcast = new Intent(ACTION_EDITOR_FINISHED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(finishBroadcast);
+        this.sendBroadcast(finishBroadcast.setPackage(this.getPackageName()));
         
         Bundle resultData = new Bundle();
         resultData.putString(EXTRA_RESULT_ACTION, ACTION_CANCEL);
         setResult(RESULT_CANCELED, getIntent().putExtras(resultData));
         finish();
-        overridePendingTransition(0, 0); // No animation
+        com.fadcam.Utils.overridePendingTransitionCompat(this, 0, 0); // No animation
     }
     
     /**
@@ -191,15 +192,15 @@ public abstract class BaseTransparentEditorActivity extends AppCompatActivity {
         Intent broadcast = new Intent(ACTION_EDITOR_RESULT);
         broadcast.putExtra(EXTRA_RESULT_CODE, RESULT_DELETE);
         broadcast.putExtra(EXTRA_RESULT_DATA, resultData);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+        this.sendBroadcast(broadcast.setPackage(this.getPackageName()));
         
         // Notify editor finished (re-enable annotation canvas)
         Intent finishBroadcast = new Intent(ACTION_EDITOR_FINISHED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(finishBroadcast);
+        this.sendBroadcast(finishBroadcast.setPackage(this.getPackageName()));
         
         resultData.putString(EXTRA_RESULT_ACTION, ACTION_DELETE);
         setResult(RESULT_OK, getIntent().putExtras(resultData));
         finish();
-        overridePendingTransition(0, 0); // No animation
+        com.fadcam.Utils.overridePendingTransitionCompat(this, 0, 0); // No animation
     }
 }

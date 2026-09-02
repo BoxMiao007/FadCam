@@ -65,7 +65,7 @@ public class PlaybackService extends Service {
             }
         } catch (Exception ignored) {}
         stopProgressUpdates();
-        stopForeground(true);
+        com.fadcam.Utils.stopForegroundCompat(this, true);
         stopSelf();
     };
     // Millis timestamp when the auto-stop alarm is scheduled (0 when none)
@@ -87,7 +87,7 @@ public class PlaybackService extends Service {
                 } catch (Exception ignored) {}
             }
             stopProgressUpdates();
-            stopForeground(true);
+            com.fadcam.Utils.stopForegroundCompat(this, true);
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -108,7 +108,7 @@ public class PlaybackService extends Service {
         }
 
         if (ACTION_START.equals(action)) {
-            Uri uri = intent.getParcelableExtra(EXTRA_URI);
+            Uri uri = com.fadcam.Utils.getParcelableExtraCompat(intent, EXTRA_URI, Uri.class);
             float speed = intent.getFloatExtra(EXTRA_SPEED, 1.0f);
             boolean muted = intent.getBooleanExtra(EXTRA_MUTED, false);
             long pos = intent.getLongExtra(EXTRA_POSITION_MS, 0L);
@@ -318,6 +318,7 @@ public class PlaybackService extends Service {
         }
     }
 
+    @SuppressWarnings("deprecation") // androidx.media.app.NotificationCompat.MediaStyle still works; the media3 MediaSession notification migration is a larger refactor
     private void buildAndShowNotification() {
         Context ctx = this;
         boolean playing = false;
@@ -457,7 +458,7 @@ public class PlaybackService extends Service {
                 player.pause(); // Ensure playback is stopped
             } catch (Exception ignored) {}
         }
-        try { stopForeground(true); } catch (Exception ignored) {}
+        try { com.fadcam.Utils.stopForegroundCompat(this, true); } catch (Exception ignored) {}
         super.onDestroy();
     }
 

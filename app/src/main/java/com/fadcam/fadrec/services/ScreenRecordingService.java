@@ -32,7 +32,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.provider.DocumentsContract;
 
@@ -139,7 +138,7 @@ public class ScreenRecordingService extends Service {
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         if (windowManager != null) {
             DisplayMetrics metrics = new DisplayMetrics();
-            windowManager.getDefaultDisplay().getRealMetrics(metrics);
+            com.fadcam.Utils.getRealDisplayMetrics(this, metrics);
             screenDensity = metrics.densityDpi;
 
             // Read configured resolution from SharedPreferences, fall back to device screen size
@@ -232,7 +231,7 @@ public class ScreenRecordingService extends Service {
             Constants.EXTRA_SCREEN_PREVIEW_ENABLED,
             currentPreviewSurface != null && currentPreviewSurface.isValid()
         );
-        LocalBroadcastManager.getInstance(this).sendBroadcast(stateIntent);
+        this.sendBroadcast(stateIntent.setPackage(this.getPackageName()));
     }
 
     private void handleStartPreviewOnly(Intent intent) {
@@ -267,7 +266,7 @@ public class ScreenRecordingService extends Service {
         releasePreviewOnlyVirtualDisplay();
         if (recordingState == ScreenRecordingState.NONE) {
             releaseProjectionIfIdle();
-            stopForeground(STOP_FOREGROUND_REMOVE);
+            com.fadcam.Utils.stopForegroundCompat(ScreenRecordingService.this, true);
             stopSelf();
         } else {
             handleQueryRecordingState();
@@ -365,7 +364,7 @@ public class ScreenRecordingService extends Service {
         FLog.d(TAG, "Got resultCode: " + resultCode + " (RESULT_OK), creating MediaProjection");
 
         try {
-            Intent permissionIntent = intent.getParcelableExtra("permissionData");
+            Intent permissionIntent = com.fadcam.Utils.getParcelableExtraCompat(intent, "permissionData", Intent.class);
             if (permissionIntent == null) {
                 FLog.d(TAG, "permissionData not found, using intent extras directly");
                 permissionIntent = intent;
@@ -386,7 +385,7 @@ public class ScreenRecordingService extends Service {
                         handleStopRecording();
                     } else {
                         releaseProjectionIfIdle();
-                        stopForeground(STOP_FOREGROUND_REMOVE);
+                        com.fadcam.Utils.stopForegroundCompat(ScreenRecordingService.this, true);
                         stopSelf();
                     }
                 }
@@ -409,7 +408,7 @@ public class ScreenRecordingService extends Service {
         if (intent == null || !intent.hasExtra("SURFACE")) {
             return;
         }
-        currentPreviewSurface = intent.getParcelableExtra("SURFACE");
+        currentPreviewSurface = com.fadcam.Utils.getParcelableExtraCompat(intent, "SURFACE", android.view.Surface.class);
         currentPreviewSurfaceWidth = intent.getIntExtra("SURFACE_WIDTH", -1);
         currentPreviewSurfaceHeight = intent.getIntExtra("SURFACE_HEIGHT", -1);
     }
@@ -783,7 +782,7 @@ public class ScreenRecordingService extends Service {
         }
         Intent broadcast = new Intent(Constants.BROADCAST_ON_SCREEN_RECORDING_MUTE_CHANGED);
         broadcast.putExtra(Constants.EXTRA_SCREEN_RECORDING_MUTED, muted);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(broadcast);
+        this.sendBroadcast(broadcast.setPackage(this.getPackageName()));
         FLog.d(TAG, "Screen recording mute updated: " + muted);
     }
     
@@ -1007,7 +1006,7 @@ public class ScreenRecordingService extends Service {
                 releaseProjectionIfIdle();
                 
                 // Stop service
-                stopForeground(true);
+                com.fadcam.Utils.stopForegroundCompat(ScreenRecordingService.this, true);
                 stopSelf();
             });
             
@@ -1425,25 +1424,25 @@ public class ScreenRecordingService extends Service {
     private void broadcastRecordingStarted() {
         Intent intent = new Intent(Constants.BROADCAST_ON_SCREEN_RECORDING_STARTED);
         intent.putExtra(Constants.INTENT_EXTRA_RECORDING_START_TIME, recordingStartTime);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        this.sendBroadcast(intent.setPackage(this.getPackageName()));
         handleQueryRecordingState();
     }
 
     private void broadcastRecordingStopped() {
         Intent intent = new Intent(Constants.BROADCAST_ON_SCREEN_RECORDING_STOPPED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        this.sendBroadcast(intent.setPackage(this.getPackageName()));
         handleQueryRecordingState();
     }
 
     private void broadcastRecordingPaused() {
         Intent intent = new Intent(Constants.BROADCAST_ON_SCREEN_RECORDING_PAUSED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        this.sendBroadcast(intent.setPackage(this.getPackageName()));
         handleQueryRecordingState();
     }
 
     private void broadcastRecordingResumed() {
         Intent intent = new Intent(Constants.BROADCAST_ON_SCREEN_RECORDING_RESUMED);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        this.sendBroadcast(intent.setPackage(this.getPackageName()));
         handleQueryRecordingState();
     }
 
